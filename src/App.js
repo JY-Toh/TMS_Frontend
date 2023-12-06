@@ -1,25 +1,46 @@
-import logo from './logo.svg';
-import './App.css';
+//External Imports
+import React from "react"
+import { BrowserRouter, Route, Routes } from "react-router-dom"
+import {ToastContainer} from "react-toastify"
+import 'react-toastify/dist/ReactToastify.css';
+
+//My Components (Internal)
+import ManageUsers from "./Admin/ManageUsers"
+import Home from "./User/Home"
+import Login from "./User/Login"
+import UserProfile from "./User/UserProfile"
+import ValidateUser from "./Components/ValidateUser"
+// import ValidateUser from "./components/ValidateUser"
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Login />} />
+          <Route path="/home" element={<Home />} />
+          <Route
+            path="/manageusers"
+            element={
+              <ValidateUser group={"admin"}>
+                <ManageUsers />
+              </ValidateUser>
+            }
+          />
+          <Route path="/manageusers" element={<ManageUsers />} />
+          <Route path="/userprofile" element={<UserProfile />} />
+        </Routes>
+      </BrowserRouter>
+      <ToastContainer closeOnClick theme="colored" autoClose={1000}/>
+    </>
+  )
 }
 
-export default App;
+// const root = ReactDOM.createRoot(document.querySelector("#app"))
+// root.render(<App />)
+
+// if (module.hot) {
+//   module.hot.accept()
+// }
+
+export default App
