@@ -102,32 +102,6 @@ function AddUser(props) {
           </Button>
         </Box>
       </Container>
-      {/* <div className="w-100">
-        <form onSubmit={newUser}>
-          <table className="w-100" border="1px solid black">
-            <tbody>
-              <tr>
-                <td width="10%">
-                  <input type="text" name="username" value={inputs.username || ""} onChange={handleChange} />
-                </td>
-                <td width="20%">
-                  <input type="text" name="email" value={inputs.email || ""} onChange={handleChange} />
-                </td>
-                <td width="10%">
-                  <input type="password" name="password" value={inputs.password || ""} onChange={handleChange} />
-                </td>
-                <td width="30%">
-                  <input type="text" name="grouplist" value={inputs.grouplist || ""} onChange={handleChange} />
-                </td>
-                <td width="10%">{inputs.is_disabled ? "Disabled" : "Active"}</td>
-                <td width="20%">
-                  <input type="submit" value="Create New User" />
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </form>
-      </div> */}
     </>
   )
 }

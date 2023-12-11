@@ -10,7 +10,7 @@ import Home from "./User/Home"
 import Login from "./User/Login"
 import UserProfile from "./User/UserProfile"
 import ValidateUser from "./Components/ValidateUser"
-// import ValidateUser from "./components/ValidateUser"
+import TaskList from "./User/TaskList"
 
 function App() {
   return (
@@ -29,6 +29,7 @@ function App() {
           />
           <Route path="/manageusers" element={<ManageUsers />} />
           <Route path="/userprofile" element={<UserProfile />} />
+          <Route path="/tasklist" element={<TaskList />} />
         </Routes>
       </BrowserRouter>
       <ToastContainer closeOnClick theme="colored" autoClose={1000}/>

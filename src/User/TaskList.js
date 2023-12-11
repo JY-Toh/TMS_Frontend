@@ -1,38 +1,36 @@
 import Cookies from "js-cookie"
-import React, { useState } from "react"
+import React from "react"
 // import Select from "react-select"
 //MUI Imports
-import Box from "@mui/material/Box"
-import Container from "@mui/material/Container"
-import Typography from "@mui/material/Typography"
+// import Box from "@mui/material/Box"
+// import Container from "@mui/material/Container"
+// import Typography from "@mui/material/Typography"
 
 import Header from "../Components/Header"
-import EditApp from "./EditApp"
-import AddApp from "./AddApp"
+// import EditApp from "./EditApp"
+// import AddApp from "./AddApp"
 
-function Home() {
+function TaskList() {
   const token = Cookies.get("jwtToken")
   const config = { headers: { Authorization: "Bearer " + token } }
-  const [appArray, setAppArray] = useState([
-    {
-      name: "Application_1",
-      rnum: "001",
-      startDate: "1/1/2023",
-      endDate: "12/12/2023",
-      description: "This is a description for an application created on 01/01/2023"
-    }
-  ])
+  // const [appArray, setAppArray] = useState([
+  //   {
+  //     name: "Application_1",
+  //     rnum: "001",
+  //     startDate: "1/1/2023",
+  //     endDate: "12/12/2023",
+  //     description: "This is a description for an application created on 01/01/2023"
+  //   }
+  // ])
 
-  const appRows = appArray.map(app => {
-    return <EditApp app={app} />
-  })
+  // const appRows = appArray.map(app => {
+  //   return <EditApp app={app} />
+  // })
 
   return (
     <>
       <Header />
-      <Container component="main" maxWidth="false">
-        {/* <Box sx={{ marginTop: 8, display: "flex", flexDirection: "column", alignItems: "center" }} /> */}
-        {/* <Box noValidate sx={{ mt: 1 }}> */}
+      {/* <Container component="main" maxWidth="false">
         <Typography variant="h3">Display list of Apps...</Typography>
         <Container maxWidth="false" height="100">
           <Box component="div" sx={{ display: "inline", p: 1, ml: 30, mr:10 }}>
@@ -65,12 +63,10 @@ function Home() {
 
           <AddApp />
           {appRows}
-          {/* </Box> */}
         </Container>
-        {/* </Box> */}
-      </Container>
+      </Container> */}
     </>
   )
 }
 
-export default Home
+export default TaskList
