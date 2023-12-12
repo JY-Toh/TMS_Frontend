@@ -61,7 +61,7 @@ function AddPlan() {
             <TextField value={inputs.Plan_endDate || ""} name="Plan_endDate" label="enddate" variant="outlined" onChange={handleChange} />
           </Box>
         </Box>
-        <TextField value={inputs.Plan_color || ""} name="Plan_color" sx={{ py: 1, px: 1, width: "30%" }} />
+        <Box sx={{ mx: 2, my: 2, width: "30%", height: 30, backgroundColor: "#F24D9F" }} />
 
         <Box sx={{ py: 1, px: 2 }}>
           <Button variant="contained" size="large" onClick={create}>

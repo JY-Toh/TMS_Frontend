@@ -14,25 +14,9 @@ function EditPlan(props) {
   const [editing, setEditing] = useState(false)
   const [groups, setGroups] = useState([])
   const [inputs, setInputs] = useState({})
-  // const [refreshApp, setRefreshApp] = useState([])
-  // const [selectedGroups, setSelectedGroups] = useState([])
   const token = Cookies.get("jwtToken")
   const config = { headers: { Authorization: "Bearer " + token } }
   const navigate = useNavigate()
-
-  // useEffect(() => {
-  //   async function getGroups() {
-  //     try {
-  //       let response = await Axios.get("http://localhost:8000/viewGroups", config)
-  //       if (response.data) {
-  //         setGroups(response.data.data.map(group => ({ value: group.group_name, label: group.group_name })))
-  //       }
-  //     } catch (e) {
-  //       console.log(e)
-  //     }
-  //   }
-  //   getGroups()
-  // }, [])
 
   const handleChange = event => {
     console.log("Hello its me \n Name:  " + event.target.name + "\n Value: " + event.target.value)
@@ -99,7 +83,8 @@ function EditPlan(props) {
           <Box sx={{ py: 1 }}>{editing ? <TextField name="Plan_startDate" variant="outlined" onChange={handleChange} /> : <TextField name="Plan_startDate" value={plan.Plan_startDate} variant="outlined" inputProps={{ readOnly: true }} />}</Box>
           <Box sx={{ py: 1 }}>{editing ? <TextField name="Plan_endDate" variant="outlined" onChange={handleChange} /> : <TextField name="Plan_endDate" value={plan.Plan_endDate} variant="outlined" inputProps={{ readOnly: true }} />}</Box>
         </Box>
-        <TextField value={inputs.Plan_color || ""} name="Plan_color" sx={{ py: 1, px: 1, width: "30%" }} />
+        <Box sx={{ mx: 2, my: 2, width: "30%", height: 30, backgroundColor: plan.Plan_color }} />
+        {/* <TextField name="Plan_color" sx={{ py: 1, px: 1, width: "30%", height:"5%", backgroundColor: plan.Plan_color }} /> */}
         <Box>
           <Box sx={{ px: 5 }}>
             {editing ? (
