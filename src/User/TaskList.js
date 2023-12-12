@@ -5,13 +5,15 @@ import React, { useState } from "react"
 import Box from "@mui/material/Box"
 // import Container from "@mui/material/Container"
 // import Typography from "@mui/material/Typography"
-import { Container, Paper, Typography } from "@mui/material"
+import { Button, Container, Paper, Typography } from "@mui/material"
+import { useNavigate } from "react-router-dom"
 
 import Header from "../Components/Header"
 // import EditApp from "./EditApp"
 // import AddApp from "./AddApp"
 
 function TaskList() {
+  const navigate = useNavigate()
   const token = Cookies.get("jwtToken")
   const config = { headers: { Authorization: "Bearer " + token } }
 
@@ -33,6 +35,19 @@ function TaskList() {
         <Typography variant="h4" gutterBottom>
           Application Name
         </Typography>
+      </Container>
+      <Box sx={{ py: 1, px: 2 }}>
+        <Button
+          variant="contained"
+          size="large"
+          onClick={() => {
+            navigate("/manageplans")
+          }}
+        >
+          Manage Plans
+        </Button>
+      </Box>
+      <Container>
         <Box display="inline" maxWidth="20px">
           <Paper>Task 1</Paper>
         </Box>
@@ -41,6 +56,17 @@ function TaskList() {
         </Box>
         <Paper>Hello</Paper>
       </Container>
+
+      {/* </Container> */}
+      {/* <Button
+        variant="Contained"
+        sx={{ backgroundColor: "#8203FA" }}
+        onClick={() => {
+          navigate("/manageplans")
+        }}
+      >
+        Go to Plans
+      </Button> */}
     </>
   )
 }

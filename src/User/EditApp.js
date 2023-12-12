@@ -50,15 +50,6 @@ function EditApp(props) {
   const save = async () => {
     try {
       const App_Acronym = app.App_Acronym
-      // console.log("first IF" + JSON.stringify(inputs))
-      // if (!inputs.email && !inputs.grouplist && inputs.password === user.grouplist) {
-      //   toast.success("Nothing changed", {
-      //     autoclose: 1000
-      //   })
-      // }
-
-      // if (inputs.App_startDate !== inputs.App_startDate || inputs.App_endDate !== inputs.App_endDate || inputs.App_Description !== inputs.App_Description || inputs.App_permit_create !== inputs.App_permit_create || inputs.App_permit_Open !== inputs.App_permit_Open || inputs.App_permit_toDoList !== inputs.App_permit_toDoList || inputs.App_permit_Doing !== inputs.App_permit_Doing || inputs.App_permit_Done !== inputs.App_permit_Done) {
-      console.log(inputs)
       const response = await Axios.post(`http://localhost:8000/updateApp/${App_Acronym}`, inputs, config)
       if (response) {
         console.log(response)
@@ -87,8 +78,11 @@ function EditApp(props) {
     setEditing(false)
   }
 
-  const goApp = () => {
-    navigate("/tasklist")
+  const goApp = (app={app}) => {
+    // const app = { app }
+    // return (
+      navigate("/tasklist")
+    // )
   }
 
   return (
