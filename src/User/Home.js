@@ -1,7 +1,6 @@
 import Axios from "axios"
 import Cookies from "js-cookie"
 import React, { useEffect, useState } from "react"
-// import Select from "react-select"
 //MUI Imports
 import Box from "@mui/material/Box"
 import Container from "@mui/material/Container"
@@ -14,15 +13,6 @@ import EditApp from "./EditApp"
 function Home() {
   const token = Cookies.get("jwtToken")
   const config = { headers: { Authorization: "Bearer " + token } }
-  // const [appArray, setAppArray] = useState([
-  //   {
-  //     name: "Application_1",
-  //     rnum: "001",
-  //     startDate: "1/1/2023",
-  //     endDate: "12/12/2023",
-  //     description: "This is a description for an application created on 01/01/2023"
-  //   }
-  // ])
   const [appArray, setAppArray] = useState([])
   const [refreshApp, setRefreshApp] = useState([false])
 
@@ -39,13 +29,7 @@ function Home() {
     }
     appInfo()
     setRefreshApp(false)
-    // setRefreshUserProfile(false)
-    // setRefreshGrouplist(false)
   }, [refreshApp])
-
-  // const userRows = userProfileArray.map(user => {
-  //   return <EditUserProfile user={user} key={user.username} setRefreshUserProfile={setRefreshUserProfile} refreshGrouplist={refreshGrouplist} />
-  // })
 
   const appRows = appArray.map(app => {
     return <EditApp app={app} setRefreshApp={setRefreshApp} />
@@ -55,7 +39,7 @@ function Home() {
     <>
       <Header />
       <Container component="main" maxWidth="false">
-        <Box align="center" sx={{py:5}}>
+        <Box align="center" sx={{ py: 5 }}>
           <Typography variant="h3">Application List</Typography>
         </Box>
         <Container maxWidth="false" height="100">
@@ -92,9 +76,7 @@ function Home() {
 
           <AddApp />
           {appRows}
-          {/* </Box> */}
         </Container>
-        {/* </Box> */}
       </Container>
     </>
   )

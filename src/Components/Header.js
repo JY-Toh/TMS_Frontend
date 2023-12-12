@@ -63,7 +63,15 @@ function Header() {
               TMS
             </Typography>
           </Button>
-          <Box sx={{ position:"absolute", right : "10%" }}>
+          <Button
+            variant="Contained"
+            onClick={() => {
+              navigate("/manageplans")
+            }}
+          >
+            Go to Plans
+          </Button>
+          <Box sx={{ position: "absolute", right: "10%" }}>
             {isAdmin && (
               <Button color="inherit" onClick={manageUsers}>
                 Account Management
