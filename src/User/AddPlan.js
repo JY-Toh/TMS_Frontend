@@ -12,8 +12,8 @@ function AddPlan(props) {
   const token = Cookies.get("jwtToken")
   const config = { headers: { Authorization: "Bearer " + token } }
   const [inputs, setInputs] = useState({})
-  const [groups, setGroups] = useState([])
-  const { setRefreshPlan } = props
+  // const [refreshcolor, setRefreshColor] = useState(false)
+  const { app, refreshPlan,setRefreshPlan } = props
 
   useEffect(() => {
     async function getColor() {
@@ -24,34 +24,25 @@ function AddPlan(props) {
           color += letters[Math.floor(Math.random() * 16)]
         }
         setInputs({ Plan_color: color })
-        setInputs(values => ({ ...values, Plan_app_Acronym: "Application_ABC" }))
+        setInputs(values => ({ ...values, Plan_app_Acronym: app.App_Acronym }))
         // setRefreshPlan(true)
       } catch (e) {
         console.log(e)
       }
     }
     getColor()
-  }, [])
-
-  // const getRandomColor = () => {
-  //   const letters = "0123456789ABCDEF"
-  //   // let color = "#"
-  //   for (let i = 0; i < 6; i++) {
-  //     hexColor += letters[Math.floor(Math.random() * 16)]
-  //   }
-  // }
-  // setInputs(values => ({ ...values, Plan_color: getRandomColor() }))
+  }, [refreshPlan])
 
   const handleChange = event => {
-    console.log("Hello its me " + event.target.value)
+    // console.log("Hello its me " + event.target.value)
     const name = event.target.name
     const value = event.target.value
     setInputs(values => ({ ...values, [name]: value }))
   }
 
   const create = async () => {
-    // setInputs(values => ({ ...values, Plan_app_Acronym: "Application_ABC" }))
-    console.log(inputs)
+    // setInputs(values => ({ ...values, Plan_app_Acronym: app.App_Acronym }))
+    // console.log(inputs)
     try {
       let response = await Axios.post("http://localhost:8000/createPlan", inputs, config)
       if (response) {

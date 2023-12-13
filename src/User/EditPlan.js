@@ -84,24 +84,16 @@ function EditPlan(props) {
           <Box sx={{ py: 1 }}>{editing ? <TextField name="Plan_endDate" variant="outlined" onChange={handleChange} /> : <TextField name="Plan_endDate" value={plan.Plan_endDate} variant="outlined" inputProps={{ readOnly: true }} />}</Box>
         </Box>
         <Box sx={{ mx: 2, my: 2, width: "30%", height: 30, backgroundColor: plan.Plan_color }} />
-        {/* <TextField name="Plan_color" sx={{ py: 1, px: 1, width: "30%", height:"5%", backgroundColor: plan.Plan_color }} /> */}
-        <Box>
-          <Box sx={{ px: 5 }}>
-            {editing ? (
-              <Button variant="contained" size="medium" onClick={save}>
-                Save
-              </Button>
-            ) : (
-              <Button variant="contained" size="medium" onClick={edit}>
-                Edit
-              </Button>
-            )}
-          </Box>
-          <Box sx={{ px: 5 }}>
-            <Button variant="contained" size="medium" onClick={goApp}>
-              Go
+        <Box sx={{ px: 5 }}>
+          {editing ? (
+            <Button variant="contained" size="large" onClick={save}>
+              Save
             </Button>
-          </Box>
+          ) : (
+            <Button variant="contained" size="large" onClick={edit}>
+              Edit
+            </Button>
+          )}
         </Box>
       </Box>
     </>
