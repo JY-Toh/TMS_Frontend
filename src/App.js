@@ -31,6 +31,7 @@ function App() {
           <Route path="/manageusers" element={<ManageUsers />} />
           <Route path="/userprofile" element={<UserProfile />} />
           <Route path="/tasklist" element={<TaskList />} />
+          {/* <Route path="/manageplans" render={(props) => <ManagePlans {...props} app={app} />} /> */}
           <Route path="/manageplans" element={<ManagePlans />} />
         </Routes>
       </BrowserRouter>

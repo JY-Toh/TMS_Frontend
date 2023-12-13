@@ -9,14 +9,12 @@ import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import TextField from "@mui/material/TextField"
 
-function AddApp() {
-  // const { setRefreshUserProfile, setRefreshGrouplist, refreshGrouplist } = props
+function AddApp(props) {
+  const { setRefreshApp } = props
   const token = Cookies.get("jwtToken")
   const config = { headers: { Authorization: "Bearer " + token } }
   const [inputs, setInputs] = useState({})
   const [groups, setGroups] = useState([])
-  // const [selectedGroups, setSelectedGroups] = useState([])
-  // const navigate = useNavigate()
 
   useEffect(() => {
     async function getGroups() {
@@ -33,43 +31,17 @@ function AddApp() {
   }, [])
 
   const handleChange = event => {
-    console.log("Hello its me " + event.target.value)
     const name = event.target.name
     const value = event.target.value
     setInputs(values => ({ ...values, [name]: value }))
   }
 
-  const handlePermitChange = event => {
-    try {
-      console.log("Hello its meeeeeeeeee " + event.target.name + " still meeeeeeee " + event.target)
-    } catch (e) {
-      console.log(e)
-    }
-  }
-
-  // const handleGroupChange = event => {
-  //   const name = event.target.name
-  //   let grouplist = ","
-  //   event.map(group => {
-  //     return (grouplist += group.value + ",")
-  //   })
-
-  //   // delete grouplist property if empty
-  //   if (grouplist === ",") {
-  //     console.log("If grouplist is empty")
-  //     setInputs(values => ({ ...values, [name]: "" }))
-  //   } else {
-  //     console.log("Grouplist containing")
-  //     setInputs(values => ({ ...values, [name]: grouplist }))
-  //   }
-
-  //   setSelectedGroups(event)
-  // }
-
   const create = async () => {
     try {
       let response = await Axios.post("http://localhost:8000/createApp", inputs, config)
       if (response) {
+        setInputs({})
+        setRefreshApp(true)
         toast.success(response.data.message, {
           autoclose: 1000
         })
@@ -106,22 +78,12 @@ function AddApp() {
           </Box>
         </Box>
         {/* <TextareaAutosize id="field2" label="Field 2"  rowsMin={3} /> */}
-        <TextField name="App_Description" label="Description" sx={{ py: 1, px: 1, width: "20%" }} onChange={handleChange} />
-        <Box sx={{ py: 1, px: 1 }}>
-          <Select name="App_permit_create" options={groups} width="30%" onChange={handlePermitChange} />
+        <TextField value={inputs.App_Description || ""} name="App_Description" label="Description" sx={{ py: 1, px: 1, width: "20%" }} onChange={handleChange} />
+        {["App_permit_create", "App_permit_Open", "App_permit_toDoList", "App_permit_Doing", "App_permit_Done"].map(state => (
+          <Box sx={{ py: 1, px: 1 }} key={state}>
+          <Select name={state} defaultValue={{ value: inputs[state], label: inputs[state] ||"Select.."}}  options={groups} width="30%" onChange={event => setInputs({ ...inputs, [state]: event.value })} classNamePrefix="select" />
         </Box>
-        <Box sx={{ py: 1, px: 1 }}>
-          <Select value={inputs.App_permit_Open || ""} name="App_permit_Open" options={groups} onChange={handleChange} className="basic-multi-select" classNamePrefix="select" width="30%" />
-        </Box>
-        <Box sx={{ py: 1, px: 1 }}>
-          <Select value={inputs.App_permit_toDoList || ""} name="App_permit_toDoList" options={groups} onChange={handleChange} className="basic-multi-select" classNamePrefix="select" width="30%" />
-        </Box>
-        <Box sx={{ py: 1, px: 1 }}>
-          <Select value={inputs.App_permit_Doing || ""} name="App_permit_Doing" options={groups} onChange={handleChange} className="basic-multi-select" classNamePrefix="select" width="30%" />
-        </Box>
-        <Box sx={{ py: 1, px: 1 }}>
-          <Select value={inputs.App_permit_Done || ""} name="App_permit_Done" options={groups} onChange={handleChange} className="basic-multi-select" classNamePrefix="select" width="30%" />
-        </Box>
+        ))}
         <Box sx={{ py: 1, px: 2 }}>
           <Button variant="contained" size="large" onClick={create}>
             Create

@@ -1,7 +1,7 @@
 import Axios from "axios"
 import Cookies from "js-cookie"
 import React, { useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 import Select from "react-select"
 import { toast } from "react-toastify"
 
@@ -15,11 +15,10 @@ function EditApp(props) {
   const [editing, setEditing] = useState(false)
   const [groups, setGroups] = useState([])
   const [inputs, setInputs] = useState({})
-  // const [refreshApp, setRefreshApp] = useState([])
-  // const [selectedGroups, setSelectedGroups] = useState([])
   const token = Cookies.get("jwtToken")
   const config = { headers: { Authorization: "Bearer " + token } }
   const navigate = useNavigate()
+  const location = useLocation()
 
   useEffect(() => {
     async function getGroups() {
@@ -52,8 +51,6 @@ function EditApp(props) {
       const App_Acronym = app.App_Acronym
       const response = await Axios.post(`http://localhost:8000/updateApp/${App_Acronym}`, inputs, config)
       if (response) {
-        console.log(response)
-        console.log(response.data)
         setInputs({})
         setRefreshApp(true)
         toast.success(response.data.message, {
@@ -78,11 +75,8 @@ function EditApp(props) {
     setEditing(false)
   }
 
-  const goApp = (app={app}) => {
-    // const app = { app }
-    // return (
-      navigate("/tasklist")
-    // )
+  const goApp = () => {
+    navigate("/tasklist", { state: app })
   }
 
   return (
@@ -99,47 +93,22 @@ function EditApp(props) {
           }
         }}
       >
-        <TextField name="App_Acronym" value={app.App_Acronym} sx={{ py: 1, px: 1, width: "10%" }} inputProps={{ readOnly: true }} />
-        <TextField name="App_Rnumber" value={app.App_Rnumber} sx={{ py: 1, px: 1, width: "5%" }} inputProps={{ readOnly: true }} />
+        <TextField name="App_Acronym" value={app.App_Acronym} sx={{ py: 1, px: 1, width: "10%" }} isDisabled />
+        <TextField name="App_Rnumber" value={app.App_Rnumber} sx={{ py: 1, px: 1, width: "5%" }} isDisabled />
         <Box noValidate autoComplete="off">
-          <Box sx={{ py: 1 }}>{editing ? <TextField name="App_startDate" variant="outlined" onChange={handleChange} /> : <TextField name="App_startDate" value={app.App_startDate} variant="outlined" inputProps={{ readOnly: true }} />}</Box>
-          <Box sx={{ py: 1 }}>{editing ? <TextField name="App_endDate" variant="outlined" onChange={handleChange} /> : <TextField name="App_endDate" value={app.App_endDate} variant="outlined" inputProps={{ readOnly: true }} />}</Box>
+          <Box sx={{ py: 1 }}>{editing ? <TextField name="App_startDate" variant="outlined" onChange={handleChange} /> : <TextField name="App_startDate" value={app.App_startDate} variant="outlined" isDisabled />}</Box>
+          <Box sx={{ py: 1 }}>{editing ? <TextField name="App_endDate" variant="outlined" onChange={handleChange} /> : <TextField name="App_endDate" value={app.App_endDate} variant="outlined" isDisabled />}</Box>
         </Box>
-        {editing ? <TextField name="App_Description" sx={{ py: 1, px: 1, width: "20%" }} onChange={handleChange} /> : <TextField name="App_Description" value={app.App_Description} sx={{ py: 1, px: 1, width: "20%" }} inputProps={{ readOnly: true }} />}
-        {editing ? (
-          <Box sx={{ py: 1, px: 1 }}>
-            <Select name="App_permit_create" options={groups} width="30%" />
-          </Box>
-        ) : (
-          <TextField name="App_permit_create" value={app.App_permit_create} InputProps={{ readOnly: true }} sx={{ py: 1, px: 1, width: "6%", overflow: "auto", whiteSpace: "normal" }} />
-        )}
-        {editing ? (
-          <Box sx={{ py: 1, px: 1 }}>
-            <Select name="App_permit_Open" options={groups} width="30%" />
-          </Box>
-        ) : (
-          <TextField name="App_permit_Open" value={app.App_permit_Open} InputProps={{ readOnly: true }} sx={{ py: 1, px: 1, width: "6%", overflow: "auto", whiteSpace: "normal" }} />
-        )}
-        {editing ? (
-          <Box sx={{ py: 1, px: 1 }}>
-            <Select name="App_permit_toDoList" options={groups} width="30%" />
-          </Box>
-        ) : (
-          <TextField name="App_permit_toDoList" value={app.App_permit_toDoList} InputProps={{ readOnly: true }} sx={{ py: 1, px: 1, width: "6%", overflow: "auto", whiteSpace: "normal" }} />
-        )}
-        {editing ? (
-          <Box sx={{ py: 1, px: 1 }}>
-            <Select name="App_permit_Doing" options={groups} width="30%" />
-          </Box>
-        ) : (
-          <TextField name="App_permit_Doing" value={app.App_permit_Doing} InputProps={{ readOnly: true }} sx={{ py: 1, px: 1, width: "6%", overflow: "auto", whiteSpace: "normal" }} />
-        )}
-        {editing ? (
-          <Box sx={{ py: 1, px: 1 }}>
-            <Select name="App_permit_Done" options={groups} width="30%" />
-          </Box>
-        ) : (
-          <TextField name="App_permit_Done" value={app.App_permit_Done} InputProps={{ readOnly: true }} sx={{ py: 1, px: 1, width: "6%", overflow: "auto", whiteSpace: "normal" }} />
+        {editing ? <TextField name="App_Description" sx={{ py: 1, px: 1, width: "20%" }} onChange={handleChange} /> : <TextField name="App_Description" value={app.App_Description} sx={{ py: 1, px: 1, width: "20%" }} isDisabled />}
+
+        {["App_permit_create", "App_permit_Open", "App_permit_toDoList", "App_permit_Doing", "App_permit_Done"].map(state =>
+          editing ? (
+            <Box sx={{ py: 1, px: 1 }} key={state}>
+              <Select name={state} defaultValue={{ value: app[state], label: app[state] || "Select.." }} options={groups} width="30%" onChange={event => setInputs({ ...inputs, [state]: event.value })} classNamePrefix="select" />
+            </Box>
+          ) : (
+            <TextField name={state} value={app[state]} InputProps={{ readOnly: true }} sx={{ py: 1, px: 1, width: "6%", overflow: "auto", whiteSpace: "normal" }} />
+          )
         )}
         <Box>
           <Box sx={{ px: 5 }}>

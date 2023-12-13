@@ -1,6 +1,7 @@
 import Axios from "axios"
 import Cookies from "js-cookie"
 import React, { useEffect, useState } from "react"
+import { useLocation } from "react-router-dom"
 // MUI Imports
 import Box from "@mui/material/Box"
 import Container from "@mui/material/Container"
@@ -15,10 +16,12 @@ function ManagePlans() {
   const config = { headers: { Authorization: "Bearer " + token } }
   const [planArray, setPlanArray] = useState([])
   const [refreshPlan, setRefreshPlan] = useState([false])
+  const location = useLocation()
+  // const navigate = useNavigate()
 
   useEffect(() => {
     async function planInfo() {
-      const App_Acronym = "Application_ABC"
+      const App_Acronym = location.state.App_Acronym
       try {
         let response = await Axios.get(`http://localhost:8000/getPlanApp/${App_Acronym}`, config)
         if (response.data) {
@@ -41,7 +44,7 @@ function ManagePlans() {
       <Header />
       <Container component="main" maxWidth="false">
         <Box align="center" sx={{ py: 5 }}>
-          <Typography variant="h3">Manage Plans for App_Acronym</Typography>
+          <Typography variant="h3">Manage Plans for {location.state.App_Acronym}</Typography>
         </Box>
         <Container maxWidth="false" height="100" align="center">
           <Box component="div" sx={{ display: "inline", py: 1, px: 5 }}>
@@ -57,7 +60,7 @@ function ManagePlans() {
             Actions
           </Box>
 
-          <AddPlan />
+          <AddPlan setRefreshPlan={setRefreshPlan} />
           {planRows}
         </Container>
       </Container>
