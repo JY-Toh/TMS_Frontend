@@ -45,16 +45,16 @@ function Home() {
         </Box>
         <Container maxWidth="false" height="100">
           <Box component="div" sx={{ display: "inline", p: 1, ml: 30, mr: 10 }}>
-            App
+            App*
           </Box>
-          <Box component="div" sx={{ display: "inline", p: 1, m: 10 }}>
-            RNumber
+          <Box component="div" sx={{ display: "inline", p: 1, m: 8 }}>
+            RNumber*
           </Box>
           <Box component="div" sx={{ display: "inline", p: 1, m: 1 }}>
             Date
           </Box>
           <Box component="div" sx={{ display: "inline", p: 1, m: 23 }}>
-            Description
+            Description*
           </Box>
           <Box component="div" sx={{ display: "inline", p: 1, m: 5 }}>
             Create

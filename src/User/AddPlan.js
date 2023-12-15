@@ -1,19 +1,17 @@
 import Axios from "axios"
 import Cookies from "js-cookie"
 import React, { useEffect, useState } from "react"
-
+import { toast } from "react-toastify"
 //Imports from MUI
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import TextField from "@mui/material/TextField"
-import { toast } from "react-toastify"
 
 function AddPlan(props) {
   const token = Cookies.get("jwtToken")
   const config = { headers: { Authorization: "Bearer " + token } }
+  const { app, refreshPlan, setRefreshPlan } = props
   const [inputs, setInputs] = useState({})
-  // const [refreshcolor, setRefreshColor] = useState(false)
-  const { app, refreshPlan,setRefreshPlan } = props
 
   useEffect(() => {
     async function getColor() {
@@ -25,7 +23,6 @@ function AddPlan(props) {
         }
         setInputs({ Plan_color: color })
         setInputs(values => ({ ...values, Plan_app_Acronym: app.App_Acronym }))
-        // setRefreshPlan(true)
       } catch (e) {
         console.log(e)
       }
@@ -34,15 +31,12 @@ function AddPlan(props) {
   }, [refreshPlan])
 
   const handleChange = event => {
-    // console.log("Hello its me " + event.target.value)
     const name = event.target.name
     const value = event.target.value
     setInputs(values => ({ ...values, [name]: value }))
   }
 
   const create = async () => {
-    // setInputs(values => ({ ...values, Plan_app_Acronym: app.App_Acronym }))
-    // console.log(inputs)
     try {
       let response = await Axios.post("http://localhost:8000/createPlan", inputs, config)
       if (response) {

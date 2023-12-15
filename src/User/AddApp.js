@@ -12,7 +12,7 @@ function AddApp(props) {
   const { setRefreshApp } = props
   const token = Cookies.get("jwtToken")
   const config = { headers: { Authorization: "Bearer " + token } }
-  
+
   const [inputs, setInputs] = useState({})
   const [groups, setGroups] = useState([])
 
@@ -77,7 +77,7 @@ function AddApp(props) {
             <TextField value={inputs.App_endDate || ""} name="App_endDate" label="enddate" variant="outlined" onChange={handleChange} />
           </Box>
         </Box>
-        <TextField value={inputs.App_Description || ""} name="App_Description" label="Description" sx={{ py: 1, px: 1, width: "20%" }} onChange={handleChange} />
+        <TextField value={inputs.App_Description || ""} name="App_Description" label="Description" multiline rows={4} sx={{ py: 1, px: 1, width: "20%" }} onChange={handleChange} />
         {["App_permit_create", "App_permit_Open", "App_permit_toDoList", "App_permit_Doing", "App_permit_Done"].map(state => (
           <Box sx={{ py: 1, px: 1 }} key={state}>
             <Select name={state} defaultValue={{ value: inputs[state], label: inputs[state] || "Select.." }} options={groups} width="30%" onChange={event => setInputs({ ...inputs, [state]: event.value })} classNamePrefix="select" />

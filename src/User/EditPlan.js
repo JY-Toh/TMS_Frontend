@@ -3,23 +3,20 @@ import Cookies from "js-cookie"
 import React, { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { toast } from "react-toastify"
-
 //Imports from MUI
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import TextField from "@mui/material/TextField"
 
 function EditPlan(props) {
-  const { plan, setRefreshPlan } = props
-  const [editing, setEditing] = useState(false)
-  const [groups, setGroups] = useState([])
-  const [inputs, setInputs] = useState({})
   const token = Cookies.get("jwtToken")
   const config = { headers: { Authorization: "Bearer " + token } }
+  const { plan, setRefreshPlan } = props
   const navigate = useNavigate()
+  const [editing, setEditing] = useState(false)
+  const [inputs, setInputs] = useState({})
 
   const handleChange = event => {
-    console.log("Hello its me \n Name:  " + event.target.name + "\n Value: " + event.target.value)
     const name = event.target.name
     const value = event.target.value
     setInputs(values => ({ ...values, [name]: value }))
@@ -32,11 +29,8 @@ function EditPlan(props) {
 
   const save = async () => {
     try {
-      const App_Acronym = "Application_ABC"
       const response = await Axios.post("http://localhost:8000/updatePlan", inputs, config)
       if (response) {
-        console.log(response)
-        console.log(response.data)
         setInputs({})
         setRefreshPlan(true)
         toast.success(response.data.message, {
@@ -45,7 +39,7 @@ function EditPlan(props) {
       }
     } catch (e) {
       try {
-        if (e.response.data.message === "Error: Not allowed to access this resource") {
+        if (e.response.data.status === 403) {
           navigate("/Home")
         }
         toast.error(e.response.data.message, {
@@ -58,10 +52,6 @@ function EditPlan(props) {
       }
     }
     setEditing(false)
-  }
-
-  const goApp = () => {
-    navigate("/tasklist")
   }
 
   return (

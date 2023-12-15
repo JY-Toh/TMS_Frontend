@@ -7,7 +7,7 @@ import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import Container from "@mui/material/Container"
 import Typography from "@mui/material/Typography"
-
+//Internal Imports
 import Header from "../Components/Header"
 import AddPlan from "./AddPlan"
 import EditPlan from "./EditPlan"
@@ -15,10 +15,10 @@ import EditPlan from "./EditPlan"
 function ManagePlans() {
   const token = Cookies.get("jwtToken")
   const config = { headers: { Authorization: "Bearer " + token } }
-  const [planArray, setPlanArray] = useState([])
-  const [refreshPlan, setRefreshPlan] = useState([false])
   const app = useLocation().state
   const navigate = useNavigate()
+  const [planArray, setPlanArray] = useState([])
+  const [refreshPlan, setRefreshPlan] = useState([false])
 
   useEffect(() => {
     async function planInfo() {

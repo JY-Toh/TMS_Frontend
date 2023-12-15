@@ -98,7 +98,7 @@ function EditApp(props) {
           <Box sx={{ py: 1 }}>{editing ? <TextField name="App_startDate" variant="outlined" onChange={handleChange} /> : <TextField name="App_startDate" value={app.App_startDate === null ? "" : app.App_startDate} variant="outlined" isDisabled />}</Box>
           <Box sx={{ py: 1 }}>{editing ? <TextField name="App_endDate" variant="outlined" onChange={handleChange} /> : <TextField name="App_endDate" value={app.App_endDate === null ? "" : app.App_endDate} variant="outlined" isDisabled />}</Box>
         </Box>
-        {editing ? <TextField name="App_Description" sx={{ py: 1, px: 1, width: "20%" }} onChange={handleChange} /> : <TextField name="App_Description" value={app.App_Description === null ? "" : app.App_Description} sx={{ py: 1, px: 1, width: "20%" }} isDisabled />}
+        {editing ? <TextField name="App_Description" multiline rows={4} sx={{ py: 1, px: 1, width: "20%" }} onChange={handleChange} /> : <TextField name="App_Description" value={app.App_Description === null ? "" : app.App_Description} multiline rows={4} sx={{ py: 1, px: 1, width: "20%" }} isDisabled />}
 
         {["App_permit_create", "App_permit_Open", "App_permit_toDoList", "App_permit_Doing", "App_permit_Done"].map(state =>
           editing ? (

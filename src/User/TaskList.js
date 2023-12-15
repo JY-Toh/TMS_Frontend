@@ -1,30 +1,31 @@
 import Axios from "axios"
 import Cookies from "js-cookie"
 import React, { useEffect, useState } from "react"
+import { useLocation, useNavigate } from "react-router-dom"
 import Select from "react-select"
 import { toast } from "react-toastify"
 //MUI Imports
 import ArrowBackIcon from "@mui/icons-material/ArrowBack"
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward"
-import Box from "@mui/material/Box"
-
 import { Button, Container, Grid, IconButton, Modal, Paper, TextField, Typography } from "@mui/material"
-import { useLocation, useNavigate } from "react-router-dom"
-
+import Box from "@mui/material/Box"
+//Internal Imports
 import Checkgroup from "../Components/CheckGroup"
 import Header from "../Components/Header"
 
 function TaskList() {
-  const navigate = useNavigate()
   const token = Cookies.get("jwtToken")
   const config = { headers: { Authorization: "Bearer " + token } }
-  const app = useLocation().state
+  const app = useLocation().state //Prop passing
+  const navigate = useNavigate()
   const initialTaskStates = { Open: [], ToDo: [], Doing: [], Done: [], Close: [] }
   const [tasks, setTasks] = useState(initialTaskStates)
-  const [openCreateTaskModal, setOpenCreateTaskModal] = useState(false)
   const [refreshTasks, setRefreshTasks] = useState(false)
+  //States for modals
+  const [openCreateTaskModal, setOpenCreateTaskModal] = useState(false)
   const [openTaskInfoModal, setOpenTaskInfoModal] = useState(false)
   const [openTaskPDModal, setOpenTaskPDModal] = useState(false)
+  //States for handling task
   const [inputs, setInputs] = useState({})
   const [selectedTask, setSelectedTask] = useState({})
   const [updatedNotes, setUpdatedNotes] = useState("")
@@ -33,19 +34,23 @@ function TaskList() {
   const [rejecting, setRejecting] = useState(false)
   const [plans, setPlans] = useState([])
   const [plan, setPlan] = useState("")
+  //States for checkgroup
+  //States for grouplist
   const [isPL, setIsPL] = useState(false)
   const [isPM, setIsPM] = useState(false)
+  //States for each Task_state
   const [open, setOpen] = useState(false)
   const [toDo, setToDo] = useState(false)
   const [doing, setDoing] = useState(false)
   const [done, setDone] = useState(false)
   const [close, setClose] = useState(false)
 
+  //Checkgroup to see if the permits are given (true)
   useEffect(() => {
     const checkPermitGroup = async () => {
       try {
         setIsPL(await Checkgroup(app.App_permit_create))
-        setIsPM(await Checkgroup("ProjectManager"))
+        setIsPM(await Checkgroup("PM"))
         setOpen(await Checkgroup(app.App_permit_Open))
         setToDo(await Checkgroup(app.App_permit_toDoList))
         setDoing(await Checkgroup(app.App_permit_Doing))
@@ -105,6 +110,7 @@ function TaskList() {
     getPlans()
   }, [])
 
+  //Check current state if user has permit
   const checkState = state => {
     switch (state) {
       case "Open":
@@ -167,7 +173,6 @@ function TaskList() {
           setSelectedTask(response.data.data[0])
           setRejecting(true)
           setDemoting(true)
-          // setEditing(true)
           setOpenTaskPDModal(true)
         }
       } else {
@@ -195,7 +200,8 @@ function TaskList() {
 
   const promoteTask = async taskId => {
     try {
-      const response = await Axios.post(`http://localhost:8000/promoteTask/${taskId}`, {}, config)
+      const update = { Task_notes: updatedNotes }
+      const response = await Axios.post(`http://localhost:8000/promoteTask/${taskId}`, update, config)
       if (response) {
         setUpdatedNotes("")
         setEditing(false)
@@ -222,7 +228,6 @@ function TaskList() {
   }
 
   const moveTask = async (e, task, currentState, nextState) => {
-    // e.stopPropagation()
     setSelectedTask({ ...task, nextState })
     openTaskPD(task.Task_id, currentState, nextState)
   }
@@ -317,7 +322,6 @@ function TaskList() {
   const saveTask = async taskId => {
     try {
       const update = { Task_notes: updatedNotes }
-      console.log(plan + update)
       const response = await Axios.post(`http://localhost:8000/updateNotes/${taskId}`, update, config)
       if (response) {
         setUpdatedNotes("")
@@ -429,8 +433,8 @@ function TaskList() {
           </Box>
 
           <Box sx={{ m: 5, maxWidth: "100%" }}>
-            <Typography>Task Description*</Typography>
-            <TextField name="Task_description" onChange={handleChange} sx={{ width: "80%" }} />
+            <Typography>Task Description</Typography>
+            <TextField name="Task_description" multiline rows={10} onChange={handleChange} sx={{ width: "80%" }} />
           </Box>
           <Box sx={{ display: "inline", mr: 250 }}>
             <Button variant="contained" size="medium" onClick={() => setOpenCreateTaskModal(false)}>
@@ -468,7 +472,7 @@ function TaskList() {
               <Typography variant="subtitle1" sx={{ fontWeight: "bold", mt: "16px" }}>
                 Task Plan
               </Typography>
-              {editing && open ? <Select name="Task_plan" defaultValue={{ value: selectedTask.Task_plan, label: selectedTask.Task_plan || "Select.." }} options={plans} width="30%" onChange={event => setPlan(event.value)} classNamePrefix="select" /> : <Typography>{selectedTask.Task_plan}</Typography>}
+              {open ? <Select name="Task_plan" defaultValue={{ value: selectedTask.Task_plan, label: selectedTask.Task_plan || "Select.." }} options={plans} width="30%" onChange={event => setPlan(event.value)} classNamePrefix="select" /> : <Typography>{selectedTask.Task_plan}</Typography>}
               <Typography variant="subtitle1" sx={{ fontWeight: "bold", mt: "16px" }}>
                 Task Owner
               </Typography>
@@ -491,9 +495,6 @@ function TaskList() {
                 Notes
               </Typography>
               <TextField multiline rows={10} value={selectedTask.Task_notes} sx={{ width: "90%" }} />
-              {/* <TextareaAutosize style={{ width: "90%" }} readOnly={true}>
-                {selectedTask.Task_notes}
-              </TextareaAutosize> */}
               {editing && <TextField label="Notes" multiline rows={4} sx={{ width: "90%", mt: "16px" }} onChange={event => setUpdatedNotes(event.target.value)} />}
             </Grid>
             <Box sx={{ display: "inline", ml: 10 }}>
@@ -552,8 +553,7 @@ function TaskList() {
               <Typography variant="subtitle1" sx={{ fontWeight: "bold", mt: "16px" }}>
                 Task Plan
               </Typography>
-              {/* {changeablePlan ? <Typography>{selectedTask.Task_plan}</Typography> : <Select name="Task_plan" defaultValue={{ value: selectedTask.Task_plan, label: selectedTask.Task_plan || "Select.." }} options={groups} width="30%" onChange={event => setInputs({ ...inputs, Task_plan: event.value })} classNamePrefix="select" />} */}
-              {editing ? <Select name="Task_plan" value={{ value: selectedTask.Task_plan, label: selectedTask.Task_plan || "Select.." }} options={plans} width="30%" onChange={event => setPlan(event.value)} classNamePrefix="select" /> : <Typography>{selectedTask.Task_plan || ""}</Typography>}
+              <Typography>{selectedTask.Task_plan || ""}</Typography>
               <Typography variant="subtitle1" sx={{ fontWeight: "bold", mt: "16px" }}>
                 Task Owner
               </Typography>
@@ -576,9 +576,6 @@ function TaskList() {
                 Notes
               </Typography>
               <TextField multiline rows={10} value={selectedTask.Task_notes} sx={{ width: "90%" }} />
-              {/* <TextareaAutosize style={{ width: "90%" }} readOnly={true}>
-                {selectedTask.Task_notes}
-              </TextareaAutosize> */}
               <TextField label="Notes" multiline rows={4} sx={{ width: "90%", mt: "16px" }} onChange={event => setUpdatedNotes(event.target.value)} />
             </Grid>
             <Box sx={{ display: "inline", ml: 10 }}>
@@ -608,7 +605,6 @@ function TaskList() {
         </Box>
       </Modal>
 
-      {/* <Grid container spacing={3} style={{ overflowY: "auto", width: "100%", paddingLeft: "20px" }}> */}
       <Grid container spacing={3}>
         {Object.keys(tasks).map((status, index, array) => (
           <Grid item key={index} xs={12 / array.length} style={{ height: "70vh", padding: "0" }}>
@@ -674,7 +670,6 @@ function TaskList() {
           </Grid>
         ))}
       </Grid>
-      {/* </Container> */}
     </>
   )
 }
