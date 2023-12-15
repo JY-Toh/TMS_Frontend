@@ -38,8 +38,10 @@ function AddUser(props) {
     setInputs(values => ({ ...values, is_disabled: false }))
     console.log(inputs)
     try {
+      console.log("Trying to axios.post call")
       let response = await Axios.post("http://localhost:8000/register", inputs, config)
       if (response) {
+        console.log("I am done with axios call for register user")
         setInputs({})
         setSelectedGroups([])
         setRefreshUserProfile(true)

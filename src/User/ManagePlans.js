@@ -48,7 +48,7 @@ function ManagePlans() {
           <Typography variant="h3">Manage Plans for {app.App_Acronym}</Typography>
         </Box>
         <Box sx={{ py: 1, px: 2 }}>
-          <Button variant="contained" size="large" onClick={() => navigate("/tasklist", { state: app })}>
+          <Button variant="contained" size="large" onClick={() => navigate(-1, { state: app })}>
             Back
           </Button>
         </Box>

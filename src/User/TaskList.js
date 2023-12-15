@@ -1,19 +1,17 @@
 import Axios from "axios"
 import Cookies from "js-cookie"
 import React, { useEffect, useState } from "react"
-// import Select from "react-select"
+import Select from "react-select"
+import { toast } from "react-toastify"
 //MUI Imports
+import ArrowBackIcon from "@mui/icons-material/ArrowBack"
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward"
 import Box from "@mui/material/Box"
-// import Container from "@mui/material/Container"
-// import Typography from "@mui/material/Typography"
-// import ArrowBackIcon from "@mui/icons-material/ArrowBack"
 
-// import ArrowForwardIcon from "@mui/icons-material/ArrowForward"
-
-import { Button, Container, Grid, Modal, Paper, TextField, Typography } from "@mui/material"
+import { Button, Container, Grid, IconButton, Modal, Paper, TextField, Typography } from "@mui/material"
 import { useLocation, useNavigate } from "react-router-dom"
 
-// import { Axios } from "axios"
+import Checkgroup from "../Components/CheckGroup"
 import Header from "../Components/Header"
 
 function TaskList() {
@@ -21,35 +19,51 @@ function TaskList() {
   const token = Cookies.get("jwtToken")
   const config = { headers: { Authorization: "Bearer " + token } }
   const app = useLocation().state
-  // const app = location.state
   const initialTaskStates = { Open: [], ToDo: [], Doing: [], Done: [], Close: [] }
   const [tasks, setTasks] = useState(initialTaskStates)
   const [openCreateTaskModal, setOpenCreateTaskModal] = useState(false)
   const [refreshTasks, setRefreshTasks] = useState(false)
   const [openTaskInfoModal, setOpenTaskInfoModal] = useState(false)
+  const [openTaskPDModal, setOpenTaskPDModal] = useState(false)
   const [inputs, setInputs] = useState({})
   const [selectedTask, setSelectedTask] = useState({})
+  const [updatedNotes, setUpdatedNotes] = useState("")
+  const [editing, setEditing] = useState(false)
+  const [demoting, setDemoting] = useState(false)
+  const [rejecting, setRejecting] = useState(false)
+  const [plans, setPlans] = useState([])
+  const [plan, setPlan] = useState("")
+  const [isPL, setIsPL] = useState(false)
+  const [isPM, setIsPM] = useState(false)
+  const [open, setOpen] = useState(false)
+  const [toDo, setToDo] = useState(false)
+  const [doing, setDoing] = useState(false)
+  const [done, setDone] = useState(false)
+  const [close, setClose] = useState(false)
 
-  // const modalStyle = {
-  //   position: "absolute",
-  //   top: "50%",
-  //   left: "50%",
-  //   transform: "translate(-50%, -50%)",
-  //   width: "70%", // Adjust the width as per your requirement
-  //   height: "80%", // Adjust the height as needed
-  //   bgcolor: "background.paper",
-  //   boxShadow: 24,
-  //   p: 4,
-  //   outline: "none",
-  //   overflowY: "auto" // Add scroll if content is too long
-  // }
+  useEffect(() => {
+    const checkPermitGroup = async () => {
+      try {
+        setIsPL(await Checkgroup(app.App_permit_create))
+        setIsPM(await Checkgroup("ProjectManager"))
+        setOpen(await Checkgroup(app.App_permit_Open))
+        setToDo(await Checkgroup(app.App_permit_toDoList))
+        setDoing(await Checkgroup(app.App_permit_Doing))
+        setDone(await Checkgroup(app.App_permit_Done))
+        setClose(await Checkgroup(app.App_permit_Close))
+      } catch (e) {
+        console.log(e)
+      }
+    }
+
+    checkPermitGroup()
+  }, [token, app, openTaskInfoModal])
 
   useEffect(() => {
     async function getTaskApp() {
       try {
         const response = await Axios.get(`http://localhost:8000/getTasksApp/${app.App_Acronym}`, config).catch(() => {})
         if (response.data) {
-          console.log(response.data)
           let newTasks = {
             Open: [],
             ToDo: [],
@@ -62,49 +76,301 @@ function TaskList() {
             if (newTasks[state]) {
               newTasks[state].push({ Task_id: task.Task_id, Task_name: task.Task_name, Plan_color: task.Plan_color })
             }
-            console.log("You there " + JSON.stringify(task))
           })
           setTasks(newTasks)
-          console.log("Me here " + JSON.stringify(newTasks))
         }
       } catch (e) {
         console.log(e)
       }
     }
     getTaskApp()
+    setSelectedTask({})
     setRefreshTasks(false)
+    setRejecting(false)
+    setDemoting(false)
+    setEditing(false)
   }, [refreshTasks])
 
-  //FKED UP
-  const createTask = async () => {
-    const taskInfo = { ...inputs, Task_app_Acronym: app.App_Acronym }
-    console.log("Task_app_Acronym: " + taskInfo.Task_app_Acronym)
-    try {
-      console.log("Task_description: " + taskInfo.Task_description)
+  useEffect(() => {
+    async function getPlans() {
       try {
-        const response = await Axios.post("http://localhost:8000/createTask", taskInfo, config)
+        let response = await Axios.get(`http://localhost:8000/getPlanApp/${app.App_Acronym}`, config)
+        if (response.data) {
+          setPlans(response.data.data.map(plan => ({ value: plan.Plan_MVP_name, label: plan.Plan_MVP_name })))
+        }
       } catch (e) {
         console.log(e)
       }
-      // if (response.data) {
-      //   console.log("Response is ->" + response.data)
-      //   setRefreshTasks(true)
-      // }
+    }
+    getPlans()
+  }, [])
+
+  const checkState = state => {
+    switch (state) {
+      case "Open":
+        return open
+      case "ToDo":
+        return toDo
+      case "Doing":
+        return doing
+      case "Done":
+        return done
+      case "Close":
+        return close
+      default:
+        return false
+    }
+  }
+
+  const createTask = async () => {
+    const taskInfo = { ...inputs, Task_app_Acronym: app.App_Acronym }
+    try {
+      const response = await Axios.post("http://localhost:8000/createTask", taskInfo, config)
+      if (response) {
+        toast.success(response.data.message, {
+          autoclose: 1000
+        })
+      }
     } catch (e) {
-      console.log(e)
-      console.log("Error showing in catch")
+      try {
+        if (e.response.data.status === 403) {
+          navigate("/Home")
+        }
+        toast.error(e.response.data.message, {
+          autoclose: 2000
+        })
+      } catch (e) {
+        toast.error(e, {
+          autoclose: 2000
+        })
+      }
     }
     setInputs({})
+    setEditing(false)
+    setRefreshTasks(true)
     setOpenCreateTaskModal(false)
+  }
+
+  const openTaskPD = async (taskId, currentState, nextState) => {
+    try {
+      if (currentState === "Doing" && nextState === "ToDo") {
+        const response = await Axios.get(`http://localhost:8000/getTaskInfo/${taskId}`, config)
+        if (response) {
+          setSelectedTask(response.data.data[0])
+          setDemoting(true)
+          setOpenTaskPDModal(true)
+        }
+      }
+      if (currentState === "Done" && nextState === "Doing") {
+        const response = await Axios.get(`http://localhost:8000/getTaskInfo/${taskId}`, config)
+        if (response) {
+          setSelectedTask(response.data.data[0])
+          setRejecting(true)
+          setDemoting(true)
+          // setEditing(true)
+          setOpenTaskPDModal(true)
+        }
+      } else {
+        const response = await Axios.get(`http://localhost:8000/getTaskInfo/${taskId}`, config)
+        if (response) {
+          setSelectedTask(response.data.data[0])
+          setOpenTaskPDModal(true)
+        }
+      }
+    } catch (e) {
+      try {
+        if (e.response.data.status === 403) {
+          navigate("/Home")
+        }
+        toast.error(e.response.data.message, {
+          autoclose: 2000
+        })
+      } catch (e) {
+        toast.error(e, {
+          autoclose: 2000
+        })
+      }
+    }
+  }
+
+  const promoteTask = async taskId => {
+    try {
+      const response = await Axios.post(`http://localhost:8000/promoteTask/${taskId}`, {}, config)
+      if (response) {
+        setUpdatedNotes("")
+        setEditing(false)
+        setRefreshTasks(true)
+        setOpenTaskPDModal(false)
+        toast.success(response.data.message, {
+          autoclose: 2000
+        })
+      }
+    } catch (e) {
+      try {
+        if (e.response.data.status === 403) {
+          navigate("/Home")
+        }
+        toast.error(e.response.data.message, {
+          autoclose: 2000
+        })
+      } catch (e) {
+        toast.error(e, {
+          autoclose: 2000
+        })
+      }
+    }
+  }
+
+  const moveTask = async (e, task, currentState, nextState) => {
+    // e.stopPropagation()
+    setSelectedTask({ ...task, nextState })
+    openTaskPD(task.Task_id, currentState, nextState)
+  }
+
+  const demoteWhich = async taskId => {
+    rejecting ? rejectTask(taskId) : returnTask(taskId)
+  }
+
+  const returnTask = async taskId => {
+    try {
+      const update = { Task_notes: updatedNotes }
+      const response = await Axios.post(`http://localhost:8000/returnTask/${taskId}`, update, config)
+      if (response) {
+        setUpdatedNotes("")
+        setPlan({})
+        setEditing(false)
+        setRejecting(false)
+        setRefreshTasks(true)
+        setOpenTaskPDModal(false)
+        toast.success(response.data.message, {
+          autoclose: 2000
+        })
+      }
+    } catch (e) {
+      try {
+        if (e.response.data.status === 403) {
+          navigate("/Home")
+        }
+        toast.error(e.response.data.message, {
+          autoclose: 2000
+        })
+      } catch (e) {
+        toast.error(e, {
+          autoclose: 2000
+        })
+      }
+    }
+  }
+
+  const rejectTask = async taskId => {
+    try {
+      const update = { Task_notes: updatedNotes, Task_plan: plan }
+      const response = await Axios.post(`http://localhost:8000/rejectTask/${taskId}`, update, config)
+      if (response) {
+        setUpdatedNotes("")
+        setPlan({})
+        setEditing(false)
+        setRejecting(false)
+        setRefreshTasks(true)
+        setOpenTaskPDModal(false)
+        toast.success(response.data.message, {
+          autoclose: 2000
+        })
+      }
+    } catch (e) {
+      try {
+        if (e.response.data.status === 403) {
+          navigate("/Home")
+        }
+        toast.error(e.response.data.message, {
+          autoclose: 2000
+        })
+      } catch (e) {
+        toast.error(e, {
+          autoclose: 2000
+        })
+      }
+    }
   }
 
   const handleTask = async taskId => {
     try {
       const response = await Axios.get(`http://localhost:8000/getTaskInfo/${taskId}`, config)
-      setSelectedTask(response.data.data)
+      setSelectedTask(response.data.data[0])
       setOpenTaskInfoModal(true)
     } catch (e) {
-      console.log(e)
+      try {
+        if (e.response.data.status === 403) {
+          navigate("/Home")
+        }
+        toast.error(e.response.data.message, {
+          autoclose: 2000
+        })
+      } catch (e) {
+        toast.error(e, {
+          autoclose: 2000
+        })
+      }
+    }
+  }
+
+  const saveTask = async taskId => {
+    try {
+      const update = { Task_notes: updatedNotes }
+      console.log(plan + update)
+      const response = await Axios.post(`http://localhost:8000/updateNotes/${taskId}`, update, config)
+      if (response) {
+        setUpdatedNotes("")
+        setPlan({})
+        setEditing(false)
+        setOpenTaskInfoModal(false)
+        toast.success(response.data.message, {
+          autoclose: 2000
+        })
+      }
+    } catch (e) {
+      try {
+        if (e.response.data.status === 403) {
+          navigate("/Home")
+        }
+        toast.error(e.response.data.message, {
+          autoclose: 2000
+        })
+      } catch (e) {
+        toast.error(e, {
+          autoclose: 2000
+        })
+      }
+    }
+  }
+
+  const assignPlan = async taskId => {
+    try {
+      const update = { Plan_app_Acronym: app.App_Acronym, Plan_MVP_name: plan, Task_notes: updatedNotes, Task_plan: plan }
+      const response = await Axios.post(`http://localhost:8000/assignTaskPlan/${taskId}`, update, config)
+      if (response) {
+        setUpdatedNotes("")
+        setPlan({})
+        setEditing(false)
+        setRefreshTasks(true)
+        setOpenTaskInfoModal(false)
+        toast.success(response.data.message, {
+          autoclose: 2000
+        })
+      }
+    } catch (e) {
+      try {
+        if (e.response.data.status === 403) {
+          navigate("/Home")
+        }
+        toast.error(e.response.data.message, {
+          autoclose: 2000
+        })
+      } catch (e) {
+        toast.error(e, {
+          autoclose: 2000
+        })
+      }
     }
   }
 
@@ -123,24 +389,28 @@ function TaskList() {
         </Typography>
       </Container>
       <Box sx={{ pb: 5, px: 2, "& button": { m: 1 } }}>
-        <Button
-          variant="contained"
-          size="large"
-          onClick={() => {
-            navigate("/manageplans", { state: app })
-          }}
-        >
-          Manage Plans
-        </Button>
-        <Button
-          variant="contained"
-          size="large"
-          onClick={() => {
-            setOpenCreateTaskModal(true)
-          }}
-        >
-          Create Task
-        </Button>
+        {isPM && (
+          <Button
+            variant="contained"
+            size="large"
+            onClick={() => {
+              navigate("/manageplans", { state: app })
+            }}
+          >
+            Manage Plans
+          </Button>
+        )}
+        {isPL && (
+          <Button
+            variant="contained"
+            size="large"
+            onClick={() => {
+              setOpenCreateTaskModal(true)
+            }}
+          >
+            Create Task
+          </Button>
+        )}
       </Box>
 
       <Modal
@@ -182,46 +452,49 @@ function TaskList() {
               <Typography variant="subtitle1" sx={{ fontWeight: "bold", mt: "16px" }}>
                 App Acronym
               </Typography>
-              <Typography>Actual Value here</Typography>
+              <Typography>{app.App_Acronym}</Typography>
               <Typography variant="subtitle1" sx={{ fontWeight: "bold", mt: "16px" }}>
                 Task Name
               </Typography>
-              <Typography>Actual Value here</Typography>
+              <Typography>{selectedTask.Task_name}</Typography>
               <Typography variant="subtitle1" sx={{ fontWeight: "bold", mt: "16px" }}>
                 ID
               </Typography>
-              <Typography>Actual Value here</Typography>
+              <Typography>{selectedTask.Task_id}</Typography>
               <Typography variant="subtitle1" sx={{ fontWeight: "bold", mt: "16px" }}>
                 Task State
               </Typography>
-              <Typography>Actual Value here</Typography>
+              <Typography>{selectedTask.Task_state}</Typography>
               <Typography variant="subtitle1" sx={{ fontWeight: "bold", mt: "16px" }}>
                 Task Plan
               </Typography>
-              <Typography>Actual Value here</Typography>
+              {editing && open ? <Select name="Task_plan" defaultValue={{ value: selectedTask.Task_plan, label: selectedTask.Task_plan || "Select.." }} options={plans} width="30%" onChange={event => setPlan(event.value)} classNamePrefix="select" /> : <Typography>{selectedTask.Task_plan}</Typography>}
               <Typography variant="subtitle1" sx={{ fontWeight: "bold", mt: "16px" }}>
                 Task Owner
               </Typography>
-              <Typography>Actual Value here</Typography>
+              <Typography>{selectedTask.Task_owner}</Typography>
               <Typography variant="subtitle1" sx={{ fontWeight: "bold", mt: "16px" }}>
                 Task Creator
               </Typography>
-              <Typography>Actual Value here</Typography>
+              <Typography>{selectedTask.Task_creator}</Typography>
               <Typography variant="subtitle1" sx={{ fontWeight: "bold", mt: "16px" }}>
                 Created
               </Typography>
-              <Typography>Actual Value here</Typography>
+              <Typography>{selectedTask.Task_createDate && selectedTask.Task_createDate.split("T", 1)}</Typography>
             </Grid>
             <Grid item xs={8} sx={{ display: "flex", flexDirection: "column" }}>
               <Typography variant="subtitle1" sx={{ fontWeight: "bold", mt: "16px" }}>
                 Description
               </Typography>
-              <Typography>Actual Value here</Typography>
+              <Typography sx={{ width: "90%" }}>{selectedTask.Task_description}</Typography>
               <Typography variant="subtitle1" sx={{ fontWeight: "bold", mt: "16px" }}>
                 Notes
               </Typography>
-              <Typography>Actual Value here</Typography>
-              <TextField label="Notes" multiline rows={4} fullWidth sx={{ mt: "16px" }} />
+              <TextField multiline rows={10} value={selectedTask.Task_notes} sx={{ width: "90%" }} />
+              {/* <TextareaAutosize style={{ width: "90%" }} readOnly={true}>
+                {selectedTask.Task_notes}
+              </TextareaAutosize> */}
+              {editing && <TextField label="Notes" multiline rows={4} sx={{ width: "90%", mt: "16px" }} onChange={event => setUpdatedNotes(event.target.value)} />}
             </Grid>
             <Box sx={{ display: "inline", ml: 10 }}>
               <Button variant="contained" size="medium" onClick={() => setOpenTaskInfoModal(false)}>
@@ -229,15 +502,107 @@ function TaskList() {
               </Button>
             </Box>
             <Box sx={{ display: "inline", ml: 240 }}>
+              {editing ? (
+                open ? (
+                  <Button variant="contained" size="medium" onClick={() => assignPlan(selectedTask.Task_id)}>
+                    Save
+                  </Button>
+                ) : (
+                  <Button variant="contained" size="medium" onClick={() => saveTask(selectedTask.Task_id)}>
+                    Save
+                  </Button>
+                )
+              ) : (
+                <Button
+                  variant="contained"
+                  size="medium"
+                  onClick={() => {
+                    setEditing(true)
+                    setPlan(selectedTask.Task_plan)
+                  }}
+                >
+                  Edit
+                </Button>
+              )}
+            </Box>
+          </Grid>
+        </Box>
+      </Modal>
+
+      <Modal open={openTaskPDModal} onClose={() => setOpenTaskPDModal(false)}>
+        <Box sx={{ margin: 2, height: "100%", backgroundColor: "white" }}>
+          <Grid container spacing={2} sx={{ m: 2, height: "100%" }}>
+            <Grid item xs={4} sx={{ display: "flex", flexDirection: "column" }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: "bold", mt: "16px" }}>
+                App Acronym
+              </Typography>
+              <Typography>{app.App_Acronym}</Typography>
+              <Typography variant="subtitle1" sx={{ fontWeight: "bold", mt: "16px" }}>
+                Task Name
+              </Typography>
+              <Typography>{selectedTask.Task_name}</Typography>
+              <Typography variant="subtitle1" sx={{ fontWeight: "bold", mt: "16px" }}>
+                ID
+              </Typography>
+              <Typography>{selectedTask.Task_id}</Typography>
+              <Typography variant="subtitle1" sx={{ fontWeight: "bold", mt: "16px" }}>
+                Task State
+              </Typography>
+              <Typography>{selectedTask.Task_state}</Typography>
+              <Typography variant="subtitle1" sx={{ fontWeight: "bold", mt: "16px" }}>
+                Task Plan
+              </Typography>
+              {/* {changeablePlan ? <Typography>{selectedTask.Task_plan}</Typography> : <Select name="Task_plan" defaultValue={{ value: selectedTask.Task_plan, label: selectedTask.Task_plan || "Select.." }} options={groups} width="30%" onChange={event => setInputs({ ...inputs, Task_plan: event.value })} classNamePrefix="select" />} */}
+              {editing ? <Select name="Task_plan" value={{ value: selectedTask.Task_plan, label: selectedTask.Task_plan || "Select.." }} options={plans} width="30%" onChange={event => setPlan(event.value)} classNamePrefix="select" /> : <Typography>{selectedTask.Task_plan || ""}</Typography>}
+              <Typography variant="subtitle1" sx={{ fontWeight: "bold", mt: "16px" }}>
+                Task Owner
+              </Typography>
+              <Typography>{selectedTask.Task_owner}</Typography>
+              <Typography variant="subtitle1" sx={{ fontWeight: "bold", mt: "16px" }}>
+                Task Creator
+              </Typography>
+              <Typography>{selectedTask.Task_creator}</Typography>
+              <Typography variant="subtitle1" sx={{ fontWeight: "bold", mt: "16px" }}>
+                Created
+              </Typography>
+              <Typography>{selectedTask.Task_createDate && selectedTask.Task_createDate.split("T", 1)}</Typography>
+            </Grid>
+            <Grid item xs={8} sx={{ display: "flex", flexDirection: "column" }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: "bold", mt: "16px" }}>
+                Description
+              </Typography>
+              <Typography sx={{ width: "90%" }}>{selectedTask.Task_description}</Typography>
+              <Typography variant="subtitle1" sx={{ fontWeight: "bold", mt: "16px" }}>
+                Notes
+              </Typography>
+              <TextField multiline rows={10} value={selectedTask.Task_notes} sx={{ width: "90%" }} />
+              {/* <TextareaAutosize style={{ width: "90%" }} readOnly={true}>
+                {selectedTask.Task_notes}
+              </TextareaAutosize> */}
+              <TextField label="Notes" multiline rows={4} sx={{ width: "90%", mt: "16px" }} onChange={event => setUpdatedNotes(event.target.value)} />
+            </Grid>
+            <Box sx={{ display: "inline", ml: 10 }}>
               <Button
                 variant="contained"
                 size="medium"
                 onClick={() => {
-                  console.log("You have clicked the UNDEFINED")
+                  setOpenTaskPDModal(false)
+                  setDemoting(false)
                 }}
               >
-                Undefined
+                Cancel
               </Button>
+            </Box>
+            <Box sx={{ display: "inline", ml: 240 }}>
+              {demoting ? (
+                <Button variant="contained" size="medium" onClick={() => demoteWhich(selectedTask.Task_id)}>
+                  Demote
+                </Button>
+              ) : (
+                <Button variant="contained" size="medium" onClick={() => promoteTask(selectedTask.Task_id)}>
+                  Promote
+                </Button>
+              )}
             </Box>
           </Grid>
         </Box>
@@ -255,7 +620,6 @@ function TaskList() {
                 tasks[status].map(task => (
                   <Paper
                     key={task.Task_id}
-                    // onClick={() => alert(task.Task_id)}
                     elevation={1}
                     style={{
                       display: "flex",
@@ -267,10 +631,17 @@ function TaskList() {
                       borderLeft: `6px solid ${task.Plan_color}`,
                       backgroundColor: "#FAFAFA"
                     }}
-                    onClick={() => {
-                      handleTask(task.Task_id)
-                    }}
                   >
+                    {checkState(status) === true && (status === "Doing" || status === "Done") && (
+                      <IconButton
+                        onClick={event => {
+                          moveTask(event, task, array[index], array[index - 1])
+                        }}
+                      >
+                        <ArrowBackIcon />
+                      </IconButton>
+                    )}
+
                     <Box
                       style={{
                         flexGrow: 1,
@@ -279,12 +650,24 @@ function TaskList() {
                         alignItems: "center",
                         textAlign: "center"
                       }}
+                      onClick={event => {
+                        handleTask(task.Task_id)
+                      }}
                     >
                       <Typography variant="body1">{task.Task_name}</Typography>
                       <Typography variant="body2" style={{ fontSize: "0.8em", color: "gray" }}>
                         {task.Task_id}
                       </Typography>
                     </Box>
+                    {status !== "Close" && checkState(status) === true && (
+                      <IconButton
+                        onClick={event => {
+                          moveTask(event, task, status, array[index + 1])
+                        }}
+                      >
+                        <ArrowForwardIcon />
+                      </IconButton>
+                    )}
                   </Paper>
                 ))}
             </Paper>

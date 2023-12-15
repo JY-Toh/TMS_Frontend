@@ -1,10 +1,9 @@
 import Axios from "axios"
 import Cookies from "js-cookie"
 import React, { useEffect, useState } from "react"
-import { useLocation, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import Select from "react-select"
 import { toast } from "react-toastify"
-
 //Imports from MUI
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
@@ -12,13 +11,14 @@ import TextField from "@mui/material/TextField"
 
 function EditApp(props) {
   const { app, setRefreshApp } = props
+  const token = Cookies.get("jwtToken")
+  const config = { headers: { Authorization: "Bearer " + token } }
+  
   const [editing, setEditing] = useState(false)
   const [groups, setGroups] = useState([])
   const [inputs, setInputs] = useState({})
-  const token = Cookies.get("jwtToken")
-  const config = { headers: { Authorization: "Bearer " + token } }
+
   const navigate = useNavigate()
-  const location = useLocation()
 
   useEffect(() => {
     async function getGroups() {
@@ -32,10 +32,10 @@ function EditApp(props) {
       }
     }
     getGroups()
+    setRefreshApp(false)
   }, [])
 
   const handleChange = event => {
-    console.log("Hello its me \n Name:  " + event.target.name + "\n Value: " + event.target.value)
     const name = event.target.name
     const value = event.target.value
     setInputs(values => ({ ...values, [name]: value }))
@@ -57,10 +57,9 @@ function EditApp(props) {
           autoclose: 1000
         })
       }
-      // }
     } catch (e) {
       try {
-        if (e.response.data.message === "Error: Not allowed to access this resource") {
+        if (e.response.data.status === 403) {
           navigate("/Home")
         }
         toast.error(e.response.data.message, {
@@ -96,10 +95,10 @@ function EditApp(props) {
         <TextField name="App_Acronym" value={app.App_Acronym} sx={{ py: 1, px: 1, width: "10%" }} isDisabled />
         <TextField name="App_Rnumber" value={app.App_Rnumber} sx={{ py: 1, px: 1, width: "5%" }} isDisabled />
         <Box noValidate autoComplete="off">
-          <Box sx={{ py: 1 }}>{editing ? <TextField name="App_startDate" variant="outlined" onChange={handleChange} /> : <TextField name="App_startDate" value={app.App_startDate} variant="outlined" isDisabled />}</Box>
-          <Box sx={{ py: 1 }}>{editing ? <TextField name="App_endDate" variant="outlined" onChange={handleChange} /> : <TextField name="App_endDate" value={app.App_endDate} variant="outlined" isDisabled />}</Box>
+          <Box sx={{ py: 1 }}>{editing ? <TextField name="App_startDate" variant="outlined" onChange={handleChange} /> : <TextField name="App_startDate" value={app.App_startDate === null ? "" : app.App_startDate} variant="outlined" isDisabled />}</Box>
+          <Box sx={{ py: 1 }}>{editing ? <TextField name="App_endDate" variant="outlined" onChange={handleChange} /> : <TextField name="App_endDate" value={app.App_endDate === null ? "" : app.App_endDate} variant="outlined" isDisabled />}</Box>
         </Box>
-        {editing ? <TextField name="App_Description" sx={{ py: 1, px: 1, width: "20%" }} onChange={handleChange} /> : <TextField name="App_Description" value={app.App_Description} sx={{ py: 1, px: 1, width: "20%" }} isDisabled />}
+        {editing ? <TextField name="App_Description" sx={{ py: 1, px: 1, width: "20%" }} onChange={handleChange} /> : <TextField name="App_Description" value={app.App_Description === null ? "" : app.App_Description} sx={{ py: 1, px: 1, width: "20%" }} isDisabled />}
 
         {["App_permit_create", "App_permit_Open", "App_permit_toDoList", "App_permit_Doing", "App_permit_Done"].map(state =>
           editing ? (
@@ -107,7 +106,7 @@ function EditApp(props) {
               <Select name={state} defaultValue={{ value: app[state], label: app[state] || "Select.." }} options={groups} width="30%" onChange={event => setInputs({ ...inputs, [state]: event.value })} classNamePrefix="select" />
             </Box>
           ) : (
-            <TextField name={state} value={app[state]} InputProps={{ readOnly: true }} sx={{ py: 1, px: 1, width: "6%", overflow: "auto", whiteSpace: "normal" }} />
+            <TextField name={state} value={app[state] === null ? "" : app[state]} InputProps={{ readOnly: true }} sx={{ py: 1, px: 1, width: "6%", overflow: "auto", whiteSpace: "normal" }} />
           )
         )}
         <Box>
