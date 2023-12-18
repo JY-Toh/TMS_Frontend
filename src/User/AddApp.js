@@ -61,6 +61,7 @@ function AddApp(props) {
         sx={{
           px: "10%",
           py: 2,
+          // width: "100%",
           "& button": { m: 1 },
           "& .MuiInputBase-input": {
             height: "25%"
@@ -70,17 +71,31 @@ function AddApp(props) {
         <TextField value={inputs.App_Acronym || ""} name="App_Acronym" label="name" sx={{ py: 1, px: 1, width: "10%" }} onChange={handleChange} />
         <TextField value={inputs.App_Rnumber || ""} name="App_Rnumber" label="Rnumber" sx={{ py: 1, px: 1, width: "5%" }} onChange={handleChange} />
         <Box noValidate autoComplete="off">
-          <Box sx={{ py: 1 }}>
+          <Box noValidate autoComplete="off" sx={{ py: 1 }}>
             <TextField value={inputs.App_startDate || ""} name="App_startDate" label="startdate" variant="outlined" onChange={handleChange} />
           </Box>
-          <Box sx={{ py: 1 }}>
+          <Box noValidate autoComplete="off" sx={{ py: 1 }}>
             <TextField value={inputs.App_endDate || ""} name="App_endDate" label="enddate" variant="outlined" onChange={handleChange} />
           </Box>
         </Box>
         <TextField value={inputs.App_Description || ""} name="App_Description" label="Description" multiline rows={4} sx={{ py: 1, px: 1, width: "20%" }} onChange={handleChange} />
         {["App_permit_create", "App_permit_Open", "App_permit_toDoList", "App_permit_Doing", "App_permit_Done"].map(state => (
           <Box sx={{ py: 1, px: 1 }} key={state}>
-            <Select name={state} defaultValue={{ value: inputs[state], label: inputs[state] || "Select.." }} options={groups} width="30%" onChange={event => setInputs({ ...inputs, [state]: event.value })} classNamePrefix="select" />
+            <Select
+              name={state}
+              defaultValue={{ value: inputs[state], label: inputs[state] || "Select.." }}
+              isClearable
+              options={groups}
+              width="30%"
+              onChange={event => {
+                if (!event) {
+                  setInputs({ ...inputs, [state]: "" })
+                } else {
+                  setInputs({ ...inputs, [state]: event.value })
+                }
+              }}
+              classNamePrefix="select"
+            />
           </Box>
         ))}
         <Box sx={{ py: 1, px: 2 }}>

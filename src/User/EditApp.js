@@ -51,6 +51,7 @@ function EditApp(props) {
   }
 
   const save = async () => {
+    console.log("my inputs are: " + JSON.stringify(inputs))
     try {
       const App_Acronym = app.App_Acronym
       const response = await Axios.post(`http://localhost:8000/updateApp/${App_Acronym}`, inputs, config)
@@ -107,7 +108,21 @@ function EditApp(props) {
         {["App_permit_create", "App_permit_Open", "App_permit_toDoList", "App_permit_Doing", "App_permit_Done"].map(state =>
           editing ? (
             <Box sx={{ py: 1, px: 1 }} key={state}>
-              <Select name={state} defaultValue={{ value: app[state], label: app[state] || "Select.." }} options={groups} width="30%" onChange={event => setInputs({ ...inputs, [state]: event.value })} classNamePrefix="select" />
+              <Select
+                name={state}
+                defaultValue={{ value: app[state], label: app[state] || "Select.." }}
+                isClearable
+                options={groups}
+                width="30%"
+                onChange={event => {
+                  if (!event) {
+                    setInputs({ ...inputs, [state]: "" })
+                  } else {
+                    setInputs({ ...inputs, [state]: event.value })
+                  }
+                }}
+                classNamePrefix="select"
+              />
             </Box>
           ) : (
             <TextField name={state} value={app[state] === null ? "" : app[state]} InputProps={{ readOnly: true }} sx={{ py: 1, px: 1, width: "6%", overflow: "auto", whiteSpace: "normal" }} />

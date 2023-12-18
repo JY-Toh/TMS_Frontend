@@ -45,7 +45,7 @@ function ManagePlans() {
       <Header />
       <Container component="main" maxWidth="false">
         <Box align="center" sx={{ py: 5 }}>
-          <Typography variant="h3">Manage Plans for {app.App_Acronym}</Typography>
+          <Typography variant="h3">{app.App_Acronym}</Typography>
         </Box>
         <Box sx={{ py: 1, px: 2 }}>
           <Button variant="contained" size="large" onClick={() => navigate(-1, { state: app })}>

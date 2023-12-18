@@ -3,7 +3,6 @@ import React from "react"
 import { BrowserRouter, Route, Routes } from "react-router-dom"
 import { ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
-// import { NavigationContainer } from '@react-navigation';
 
 //My Components (Internal)
 import ManageUsers from "./Admin/ManageUsers"
@@ -18,7 +17,6 @@ function App() {
   return (
     <>
       <BrowserRouter>
-        {/* <NavigationContainer> */}
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/home" element={<Home />} />
@@ -35,7 +33,6 @@ function App() {
           <Route path="/tasklist" element={<TaskList />} />
           <Route path="/manageplans" element={<ManagePlans />} />
         </Routes>
-        {/* </NavigationContainer> */}
       </BrowserRouter>
       <ToastContainer closeOnClick theme="colored" autoClose={1000} />
     </>
