@@ -9,6 +9,7 @@ import Typography from "@mui/material/Typography"
 import Header from "../Components/Header"
 import AddApp from "./AddApp"
 import EditApp from "./EditApp"
+import Checkgroup from "../Components/CheckGroup"
 
 function Home() {
   const token = Cookies.get("jwtToken")
@@ -16,6 +17,7 @@ function Home() {
   //States for application
   const [appArray, setAppArray] = useState([])
   const [refreshApp, setRefreshApp] = useState(false)
+  const [isPL, setIsPL]=useState(false)
 
   useEffect(() => {
     async function appInfo() {
@@ -23,6 +25,7 @@ function Home() {
         let response = await Axios.get("http://localhost:8000/getApps", config)
         if (response.data) {
           setAppArray(response.data.data)
+          setIsPL(await Checkgroup("PL"))
         }
       } catch (e) {
         console.log(e)
@@ -33,7 +36,7 @@ function Home() {
   }, [refreshApp])
 
   const appRows = appArray.map(app => {
-    return <EditApp app={app} setRefreshApp={setRefreshApp} />
+    return <EditApp app={app} setRefreshApp={setRefreshApp} isPL={isPL} />
   })
 
   return (
@@ -75,7 +78,7 @@ function Home() {
             Actions
           </Box>
 
-          <AddApp setRefreshApp={setRefreshApp} />
+          {isPL && <AddApp setRefreshApp={setRefreshApp} />}
           {appRows}
         </Container>
       </Container>

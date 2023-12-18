@@ -11,6 +11,7 @@ function AddPlan(props) {
   const token = Cookies.get("jwtToken")
   const config = { headers: { Authorization: "Bearer " + token } }
   const { app, refreshPlan, setRefreshPlan } = props
+  const [isPL, setIsPL] = useState(false)
   const [inputs, setInputs] = useState({})
 
   useEffect(() => {

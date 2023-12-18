@@ -40,6 +40,7 @@ function TaskList() {
   const [isPL, setIsPL] = useState(false)
   const [isPM, setIsPM] = useState(false)
   //States for each Task_state
+  const [create, setCreate] = useState(false)
   const [open, setOpen] = useState(false)
   const [toDo, setToDo] = useState(false)
   const [doing, setDoing] = useState(false)
@@ -97,8 +98,9 @@ function TaskList() {
   useEffect(() => {
     const checkPermitGroup = async () => {
       try {
-        setIsPL(await Checkgroup(app.App_permit_create))
+        setIsPL(await Checkgroup("PL"))
         setIsPM(await Checkgroup("PM"))
+        setCreate(await Checkgroup(app.App_permit_create))
         setOpen(await Checkgroup(app.App_permit_Open))
         setToDo(await Checkgroup(app.App_permit_toDoList))
         setDoing(await Checkgroup(app.App_permit_Doing))
@@ -428,7 +430,7 @@ function TaskList() {
             Manage Plans
           </Button>
         )}
-        {isPL && (
+        {create && (
           <Button
             variant="contained"
             size="large"

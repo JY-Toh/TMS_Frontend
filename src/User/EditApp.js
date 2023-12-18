@@ -9,17 +9,17 @@ import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import TextField from "@mui/material/TextField"
 //Internal Imports
-import Checkgroup from "../Components/CheckGroup"
+// import Checkgroup from "../Components/CheckGroup"
 
 function EditApp(props) {
-  const { app, setRefreshApp } = props
+  const { app, setRefreshApp, isPL } = props
   const token = Cookies.get("jwtToken")
   const config = { headers: { Authorization: "Bearer " + token } }
-  
+
   const [editing, setEditing] = useState(false)
   const [groups, setGroups] = useState([])
   const [inputs, setInputs] = useState({})
-  const [createPermit, setCreatePermit]=useState(false)
+  // const [isPL, setIsPL] = useState(false)
 
   const navigate = useNavigate()
 
@@ -30,7 +30,7 @@ function EditApp(props) {
         if (response.data) {
           setGroups(response.data.data.map(group => ({ value: group.group_name, label: group.group_name })))
         }
-        setCreatePermit(await Checkgroup("PL"))
+        // setIsPL(await Checkgroup("PL"))
       } catch (e) {
         console.log(e)
       }
@@ -115,7 +115,8 @@ function EditApp(props) {
         )}
         <Box>
           <Box sx={{ px: 5 }}>
-             {createPermit && (editing ? (
+            {isPL &&
+              (editing ? (
                 <Button variant="contained" size="medium" onClick={save}>
                   Save
                 </Button>
@@ -123,17 +124,7 @@ function EditApp(props) {
                 <Button variant="contained" size="medium" onClick={edit}>
                   Edit
                 </Button>
-              ))
-            }
-             {/* {editing ? (
-              <Button variant="contained" size="medium" onClick={save}>
-                Save
-              </Button>
-            ) : (
-              <Button variant="contained" size="medium" onClick={edit}>
-                Edit
-              </Button>
-            )} */}
+              ))}
           </Box>
           <Box sx={{ px: 5 }}>
             <Button variant="contained" size="medium" onClick={goApp}>
