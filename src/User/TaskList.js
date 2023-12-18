@@ -498,7 +498,7 @@ function TaskList() {
               <Typography variant="subtitle1" sx={{ fontWeight: "bold", mt: "16px" }}>
                 Task Plan
               </Typography>
-              {open ? <Select name="Task_plan" defaultValue={{ value: selectedTask.Task_plan, label: selectedTask.Task_plan || "Select.." }} options={plans} width="30%" onChange={event => setPlan(event.value)} classNamePrefix="select" /> : <Typography>{selectedTask.Task_plan}</Typography>}
+              {open && selectedTask.Task_state === "Open" && editing ? <Select name="Task_plan" defaultValue={{ value: selectedTask.Task_plan, label: selectedTask.Task_plan || "Select.." }} options={plans} width="30%" onChange={event => setPlan(event.value)} classNamePrefix="select" /> : <Typography>{selectedTask.Task_plan}</Typography>}
               <Typography variant="subtitle1" sx={{ fontWeight: "bold", mt: "16px" }}>
                 Task Owner
               </Typography>
@@ -524,7 +524,14 @@ function TaskList() {
               {editing && <TextField label="Notes" multiline rows={4} sx={{ width: "90%", mt: "16px" }} onChange={event => setUpdatedNotes(event.target.value)} />}
             </Grid>
             <Box sx={{ display: "inline", ml: "10%" }}>
-              <Button variant="contained" size="medium" onClick={() => setOpenTaskInfoModal(false)}>
+              <Button
+                variant="contained"
+                size="medium"
+                onClick={() => {
+                  setOpenTaskInfoModal(false)
+                  setEditing(false)
+                }}
+              >
                 Cancel
               </Button>
             </Box>
@@ -579,7 +586,7 @@ function TaskList() {
               <Typography variant="subtitle1" sx={{ fontWeight: "bold", mt: "16px" }}>
                 Task Plan
               </Typography>
-              <Typography>{selectedTask.Task_plan || ""}</Typography>
+              {done && selectedTask.Task_state === "Done" && rejecting ? <Select name="Task_plan" defaultValue={{ value: selectedTask.Task_plan, label: selectedTask.Task_plan || "Select.." }} options={plans} width="30%" onChange={event => setPlan(event.value)} classNamePrefix="select" /> : <Typography>{selectedTask.Task_plan}</Typography>}
               <Typography variant="subtitle1" sx={{ fontWeight: "bold", mt: "16px" }}>
                 Task Owner
               </Typography>
