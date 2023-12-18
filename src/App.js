@@ -19,7 +19,14 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Login />} />
-          <Route path="/home" element={<Home />} />
+          <Route
+            path="/home"
+            element={
+              <ValidateUser>
+                <Home />
+              </ValidateUser>
+            }
+          />
           <Route
             path="/manageusers"
             element={
@@ -28,10 +35,30 @@ function App() {
               </ValidateUser>
             }
           />
-          <Route path="/manageusers" element={<ManageUsers />} />
-          <Route path="/userprofile" element={<UserProfile />} />
-          <Route path="/tasklist" element={<TaskList />} />
-          <Route path="/manageplans" element={<ManagePlans />} />
+          <Route
+            path="/userprofile"
+            element={
+              <ValidateUser>
+                <UserProfile />
+              </ValidateUser>
+            }
+          />
+          <Route
+            path="/tasklist"
+            element={
+              <ValidateUser>
+                <TaskList />
+              </ValidateUser>
+            }
+          />
+          <Route
+            path="/manageplans"
+            element={
+              <ValidateUser group={"PM"}>
+                <ManagePlans />
+              </ValidateUser>
+            }
+          />
         </Routes>
       </BrowserRouter>
       <ToastContainer closeOnClick theme="colored" autoClose={1000} />

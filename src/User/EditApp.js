@@ -30,7 +30,6 @@ function EditApp(props) {
         if (response.data) {
           setGroups(response.data.data.map(group => ({ value: group.group_name, label: group.group_name })))
         }
-        // setIsPL(await Checkgroup("PL"))
       } catch (e) {
         console.log(e)
       }
