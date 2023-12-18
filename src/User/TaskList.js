@@ -16,7 +16,7 @@ import Header from "../Components/Header"
 function TaskList() {
   const token = Cookies.get("jwtToken")
   const config = { headers: { Authorization: "Bearer " + token } }
-  const app = useLocation().state //Prop passing
+  // const initialApp = useLocation().state //Prop passing
   const navigate = useNavigate()
   const initialTaskStates = { Open: [], ToDo: [], Doing: [], Done: [], Close: [] }
   const [tasks, setTasks] = useState(initialTaskStates)
@@ -26,6 +26,7 @@ function TaskList() {
   const [openTaskInfoModal, setOpenTaskInfoModal] = useState(false)
   const [openTaskPDModal, setOpenTaskPDModal] = useState(false)
   //States for handling task
+  const [app, setApp] = useState(useLocation().state)
   const [inputs, setInputs] = useState({})
   const [selectedTask, setSelectedTask] = useState({})
   const [updatedNotes, setUpdatedNotes] = useState("")
@@ -45,24 +46,19 @@ function TaskList() {
   const [done, setDone] = useState(false)
   const [close, setClose] = useState(false)
 
-  //Checkgroup to see if the permits are given (true)
   useEffect(() => {
-    const checkPermitGroup = async () => {
+    async function getApp() {
       try {
-        setIsPL(await Checkgroup(app.App_permit_create))
-        setIsPM(await Checkgroup("PM"))
-        setOpen(await Checkgroup(app.App_permit_Open))
-        setToDo(await Checkgroup(app.App_permit_toDoList))
-        setDoing(await Checkgroup(app.App_permit_Doing))
-        setDone(await Checkgroup(app.App_permit_Done))
-        setClose(await Checkgroup(app.App_permit_Close))
+        const response = await Axios.get(`http://localhost:8000/getAppInfo/${app.App_Acronym}`, config)
+        if (response) {
+          setApp(response.data.data[0])
+        }
       } catch (e) {
         console.log(e)
       }
     }
-
-    checkPermitGroup()
-  }, [token, app, openTaskInfoModal])
+    getApp()
+  }, [refreshTasks])
 
   useEffect(() => {
     async function getTaskApp() {
@@ -88,13 +84,33 @@ function TaskList() {
         console.log(e)
       }
     }
+
     getTaskApp()
     setSelectedTask({})
     setRefreshTasks(false)
     setRejecting(false)
     setDemoting(false)
     setEditing(false)
-  }, [refreshTasks])
+  }, [app])
+
+  //Checkgroup to see if the permits are given (true)
+  useEffect(() => {
+    const checkPermitGroup = async () => {
+      try {
+        setIsPL(await Checkgroup(app.App_permit_create))
+        setIsPM(await Checkgroup("PM"))
+        setOpen(await Checkgroup(app.App_permit_Open))
+        setToDo(await Checkgroup(app.App_permit_toDoList))
+        setDoing(await Checkgroup(app.App_permit_Doing))
+        setDone(await Checkgroup(app.App_permit_Done))
+        setClose(await Checkgroup(app.App_permit_Close))
+      } catch (e) {
+        console.log(e)
+      }
+    }
+
+    checkPermitGroup()
+  }, [token, app, openCreateTaskModal, openTaskInfoModal, openTaskPDModal])
 
   useEffect(() => {
     async function getPlans() {
@@ -139,8 +155,9 @@ function TaskList() {
       }
     } catch (e) {
       try {
-        if (e.response.data.status === 403) {
-          navigate("/Home")
+        if (e.response.data.message === "Error: Not authorised") {
+          setOpenCreateTaskModal(false)
+          setRefreshTasks(true)
         }
         toast.error(e.response.data.message, {
           autoclose: 2000
@@ -184,8 +201,9 @@ function TaskList() {
       }
     } catch (e) {
       try {
-        if (e.response.data.status === 403) {
-          navigate("/Home")
+        if (e.response.data.message === "Error: Not authorised") {
+          setOpenTaskInfoModal(false)
+          setRefreshTasks(true)
         }
         toast.error(e.response.data.message, {
           autoclose: 2000
@@ -213,8 +231,9 @@ function TaskList() {
       }
     } catch (e) {
       try {
-        if (e.response.data.status === 403) {
-          navigate("/Home")
+        if (e.response.data.message === "Error: Not authorised") {
+          setOpenTaskPDModal(false)
+          setRefreshTasks(true)
         }
         toast.error(e.response.data.message, {
           autoclose: 2000
@@ -253,8 +272,9 @@ function TaskList() {
       }
     } catch (e) {
       try {
-        if (e.response.data.status === 403) {
-          navigate("/Home")
+        if (e.response.data.message === "Error: Not authorised") {
+          setOpenTaskPDModal(false)
+          setRefreshTasks(true)
         }
         toast.error(e.response.data.message, {
           autoclose: 2000
@@ -284,8 +304,9 @@ function TaskList() {
       }
     } catch (e) {
       try {
-        if (e.response.data.status === 403) {
-          navigate("/Home")
+        if (e.response.data.message === "Error: Not authorised") {
+          setOpenTaskPDModal(false)
+          setRefreshTasks(true)
         }
         toast.error(e.response.data.message, {
           autoclose: 2000
@@ -305,8 +326,9 @@ function TaskList() {
       setOpenTaskInfoModal(true)
     } catch (e) {
       try {
-        if (e.response.data.status === 403) {
-          navigate("/Home")
+        if (e.response.data.message === "Error: Not authorised") {
+          setOpenTaskInfoModal(false)
+          setRefreshTasks(true)
         }
         toast.error(e.response.data.message, {
           autoclose: 2000
@@ -334,8 +356,9 @@ function TaskList() {
       }
     } catch (e) {
       try {
-        if (e.response.data.status === 403) {
-          navigate("/Home")
+        if (e.response.data.message === "Error: Not authorised") {
+          setOpenTaskInfoModal(false)
+          setRefreshTasks(true)
         }
         toast.error(e.response.data.message, {
           autoclose: 2000
@@ -364,8 +387,9 @@ function TaskList() {
       }
     } catch (e) {
       try {
-        if (e.response.data.status === 403) {
-          navigate("/Home")
+        if (e.response.data.message === "Error: Not authorised") {
+          setOpenTaskInfoModal(false)
+          setRefreshTasks(true)
         }
         toast.error(e.response.data.message, {
           autoclose: 2000
@@ -497,12 +521,12 @@ function TaskList() {
               <TextField multiline rows={10} value={selectedTask.Task_notes} sx={{ width: "90%" }} />
               {editing && <TextField label="Notes" multiline rows={4} sx={{ width: "90%", mt: "16px" }} onChange={event => setUpdatedNotes(event.target.value)} />}
             </Grid>
-            <Box sx={{ display: "inline", ml: 10 }}>
+            <Box sx={{ display: "inline", ml: "10%" }}>
               <Button variant="contained" size="medium" onClick={() => setOpenTaskInfoModal(false)}>
                 Cancel
               </Button>
             </Box>
-            <Box sx={{ display: "inline", ml: 240 }}>
+            <Box sx={{ display: "inline", ml: "70%" }}>
               {editing ? (
                 open ? (
                   <Button variant="contained" size="medium" onClick={() => assignPlan(selectedTask.Task_id)}>
@@ -578,7 +602,7 @@ function TaskList() {
               <TextField multiline rows={10} value={selectedTask.Task_notes} sx={{ width: "90%" }} />
               <TextField label="Notes" multiline rows={4} sx={{ width: "90%", mt: "16px" }} onChange={event => setUpdatedNotes(event.target.value)} />
             </Grid>
-            <Box sx={{ display: "inline", ml: 10 }}>
+            <Box sx={{ display: "inline", ml: "10%" }}>
               <Button
                 variant="contained"
                 size="medium"
@@ -590,7 +614,7 @@ function TaskList() {
                 Cancel
               </Button>
             </Box>
-            <Box sx={{ display: "inline", ml: 240 }}>
+            <Box sx={{ display: "inline", ml: "70%" }}>
               {demoting ? (
                 <Button variant="contained" size="medium" onClick={() => demoteWhich(selectedTask.Task_id)}>
                   Demote

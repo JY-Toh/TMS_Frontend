@@ -90,7 +90,7 @@ function EditUserProfile(props) {
       }
     } catch (e) {
       try {
-        if (e.response.data.message === "Error: Not allowed to access this resource") {
+        if (e.response.data.message === "Error: Not authorised") {
           navigate("/Home")
         }
         toast.error(e.response.data.message, {

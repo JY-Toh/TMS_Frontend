@@ -8,6 +8,8 @@ import { toast } from "react-toastify"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import TextField from "@mui/material/TextField"
+//Internal Imports
+import Checkgroup from "../Components/CheckGroup"
 
 function EditApp(props) {
   const { app, setRefreshApp } = props
@@ -17,6 +19,7 @@ function EditApp(props) {
   const [editing, setEditing] = useState(false)
   const [groups, setGroups] = useState([])
   const [inputs, setInputs] = useState({})
+  const [createPermit, setCreatePermit]=useState(false)
 
   const navigate = useNavigate()
 
@@ -27,6 +30,7 @@ function EditApp(props) {
         if (response.data) {
           setGroups(response.data.data.map(group => ({ value: group.group_name, label: group.group_name })))
         }
+        setCreatePermit(await Checkgroup("PL"))
       } catch (e) {
         console.log(e)
       }
@@ -111,7 +115,17 @@ function EditApp(props) {
         )}
         <Box>
           <Box sx={{ px: 5 }}>
-            {editing ? (
+             {createPermit && (editing ? (
+                <Button variant="contained" size="medium" onClick={save}>
+                  Save
+                </Button>
+              ) : (
+                <Button variant="contained" size="medium" onClick={edit}>
+                  Edit
+                </Button>
+              ))
+            }
+             {/* {editing ? (
               <Button variant="contained" size="medium" onClick={save}>
                 Save
               </Button>
@@ -119,7 +133,7 @@ function EditApp(props) {
               <Button variant="contained" size="medium" onClick={edit}>
                 Edit
               </Button>
-            )}
+            )} */}
           </Box>
           <Box sx={{ px: 5 }}>
             <Button variant="contained" size="medium" onClick={goApp}>
