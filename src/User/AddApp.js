@@ -59,7 +59,7 @@ function AddApp(props) {
         component="div"
         display="flex"
         sx={{
-          px: "10%",
+          px: "5%",
           py: 2,
           // width: "100%",
           "& button": { m: 1 },

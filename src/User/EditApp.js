@@ -9,7 +9,6 @@ import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import TextField from "@mui/material/TextField"
 //Internal Imports
-// import Checkgroup from "../Components/CheckGroup"
 
 function EditApp(props) {
   const { app, setRefreshApp, isPL } = props
@@ -19,7 +18,6 @@ function EditApp(props) {
   const [editing, setEditing] = useState(false)
   const [groups, setGroups] = useState([])
   const [inputs, setInputs] = useState({})
-  // const [isPL, setIsPL] = useState(false)
 
   const navigate = useNavigate()
 
@@ -88,7 +86,7 @@ function EditApp(props) {
         component="div"
         display="flex"
         sx={{
-          px: "10%",
+          px: "5 %",
           py: 2,
           "& button": { m: 1 },
           "& .MuiInputBase-input": {
