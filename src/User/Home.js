@@ -47,19 +47,19 @@ function Home() {
           <Typography variant="h3">Application List</Typography>
         </Box>
         <Container maxWidth="false" height="100">
-          <Box component="div" sx={{ display: "inline", p: 1, ml: "10%" }}>
+          <Box component="div" sx={{ display: "inline", p: 1, ml: "7%" }}>
             App*
           </Box>
-          <Box component="div" sx={{ display: "inline", p: 1, ml: "7%" }}>
+          <Box component="div" sx={{ display: "inline", p: 1, ml: "5%" }}>
             RNumber*
           </Box>
           <Box component="div" sx={{ display: "inline", p: 1, ml: "2%" }}>
             Date
           </Box>
-          <Box component="div" sx={{ display: "inline", p: 1, ml: "7%" }}>
+          <Box component="div" sx={{ display: "inline", p: 1, ml: "10%" }}>
             Description*
           </Box>
-          <Box component="div" sx={{ display: "inline", p: 1, ml: "12%" }}>
+          <Box component="div" sx={{ display: "inline", p: 1, ml: "13%" }}>
             Create
           </Box>
           <Box component="div" sx={{ display: "inline", p: 1, ml: "3.5%" }}>

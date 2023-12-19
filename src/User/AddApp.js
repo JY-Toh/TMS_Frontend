@@ -61,7 +61,6 @@ function AddApp(props) {
         sx={{
           px: "5%",
           py: 2,
-          // width: "100%",
           "& button": { m: 1 },
           "& .MuiInputBase-input": {
             height: "25%"
@@ -83,7 +82,7 @@ function AddApp(props) {
           <Box sx={{ py: 1, px: 1 }} key={state}>
             <Select
               name={state}
-              defaultValue={{ value: inputs[state], label: inputs[state] || "Select.." }}
+              defaultValue={{ value: inputs[state], label: inputs[state] || null }}
               isClearable
               options={groups}
               width="30%"

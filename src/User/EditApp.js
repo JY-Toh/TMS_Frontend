@@ -86,7 +86,7 @@ function EditApp(props) {
         component="div"
         display="flex"
         sx={{
-          px: "5 %",
+          px: "5%",
           py: 2,
           "& button": { m: 1 },
           "& .MuiInputBase-input": {

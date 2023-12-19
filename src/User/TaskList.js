@@ -263,7 +263,7 @@ function TaskList() {
       const response = await Axios.post(`http://localhost:8000/returnTask/${taskId}`, update, config)
       if (response) {
         setUpdatedNotes("")
-        setPlan({})
+        setPlan("")
         setEditing(false)
         setRejecting(false)
         setRefreshTasks(true)
@@ -291,11 +291,18 @@ function TaskList() {
 
   const rejectTask = async taskId => {
     try {
-      const update = { Task_notes: updatedNotes, Task_plan: plan }
+      let input
+      if (plan === "" || plan === null) {
+        input = selectedTask.Task_plan
+      } else {
+        input = plan
+      }
+      const update = { Task_notes: updatedNotes, Task_plan: input }
+      console.log(input)
       const response = await Axios.post(`http://localhost:8000/rejectTask/${taskId}`, update, config)
       if (response) {
         setUpdatedNotes("")
-        setPlan({})
+        setPlan("")
         setEditing(false)
         setRejecting(false)
         setRefreshTasks(true)
@@ -349,7 +356,7 @@ function TaskList() {
       const response = await Axios.post(`http://localhost:8000/updateNotes/${taskId}`, update, config)
       if (response) {
         setUpdatedNotes("")
-        setPlan({})
+        setPlan("")
         setEditing(false)
         setOpenTaskInfoModal(false)
         toast.success(response.data.message, {
@@ -375,17 +382,31 @@ function TaskList() {
 
   const assignPlan = async taskId => {
     try {
-      const update = { Plan_app_Acronym: app.App_Acronym, Plan_MVP_name: plan, Task_notes: updatedNotes, Task_plan: plan }
-      const response = await Axios.post(`http://localhost:8000/assignTaskPlan/${taskId}`, update, config)
-      if (response) {
-        setUpdatedNotes("")
-        setPlan({})
-        setEditing(false)
-        setRefreshTasks(true)
-        setOpenTaskInfoModal(false)
-        toast.success(response.data.message, {
-          autoclose: 2000
-        })
+      if (selectedTask.Task_plan === plan) {
+        const update = { Task_notes: updatedNotes }
+        const response = await Axios.post(`http://localhost:8000/updateNotes/${taskId}`, update, config)
+        if (response) {
+          setUpdatedNotes("")
+          setEditing(false)
+          setRefreshTasks(true)
+          setOpenTaskInfoModal(false)
+          toast.success(response.data.message, {
+            autoclose: 2000
+          })
+        }
+      } else {
+        const update = { Plan_app_Acronym: app.App_Acronym, Plan_MVP_name: plan, Task_notes: updatedNotes }
+        const response = await Axios.post(`http://localhost:8000/assignTaskPlan/${taskId}`, update, config)
+        if (response) {
+          setUpdatedNotes("")
+          setPlan("")
+          setEditing(false)
+          setRefreshTasks(true)
+          setOpenTaskInfoModal(false)
+          toast.success(response.data.message, {
+            autoclose: 2000
+          })
+        }
       }
     } catch (e) {
       try {
@@ -462,7 +483,7 @@ function TaskList() {
             <Typography>Task Description</Typography>
             <TextField name="Task_description" multiline rows={10} onChange={handleChange} sx={{ width: "80%" }} />
           </Box>
-          <Box sx={{ display: "inline", mr: 250 }}>
+          <Box sx={{ display: "inline", mr: "50%" }}>
             <Button variant="contained" size="medium" onClick={() => setOpenCreateTaskModal(false)}>
               Cancel
             </Button>
@@ -498,7 +519,20 @@ function TaskList() {
               <Typography variant="subtitle1" sx={{ fontWeight: "bold", mt: "16px" }}>
                 Task Plan
               </Typography>
-              {open && selectedTask.Task_state === "Open" && editing ? <Select name="Task_plan" defaultValue={{ value: selectedTask.Task_plan, label: selectedTask.Task_plan || "Select.." }} options={plans} width="30%" onChange={event => setPlan(event.value)} classNamePrefix="select" /> : <Typography>{selectedTask.Task_plan}</Typography>}
+              {open && selectedTask.Task_state === "Open" && editing ? (
+                <Select
+                  name="Task_plan"
+                  defaultValue={{ value: selectedTask.Task_plan, label: selectedTask.Task_plan || "Select.." }}
+                  options={plans}
+                  width="30%"
+                  onChange={event => {
+                    setPlan(event.value)
+                  }}
+                  classNamePrefix="select"
+                />
+              ) : (
+                <Typography>{selectedTask.Task_plan}</Typography>
+              )}
               <Typography variant="subtitle1" sx={{ fontWeight: "bold", mt: "16px" }}>
                 Task Owner
               </Typography>
