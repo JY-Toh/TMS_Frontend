@@ -298,7 +298,6 @@ function TaskList() {
         input = plan
       }
       const update = { Task_notes: updatedNotes, Task_plan: input }
-      console.log(input)
       const response = await Axios.post(`http://localhost:8000/rejectTask/${taskId}`, update, config)
       if (response) {
         setUpdatedNotes("")
